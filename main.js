@@ -78,7 +78,7 @@ ${manifest.changelog ? `[Changelog](${manifest.changelog})` : ""}
 				name: "Stats:",
 				value: `
 **Installs:** ${package.installs}%
-**Likes:** ${fhub.endorsements}
+**Endorsements:** ${fhub.endorsements}
 **Comments:** ${fhub.comments}
 					`,
 				inline: true
