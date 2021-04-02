@@ -16,7 +16,7 @@ class EnhancedModel extends Model {
 	}
 }
 
-class Reputation extends EnhancedModel {
+/*class Rep extends EnhancedModel {
 	static get schema() {
 		return {
 			user: {
@@ -36,8 +36,8 @@ class Reputation extends EnhancedModel {
 			tableName: "Reputation"
 		}
 	}
-}
-class ReputationDelta extends EnhancedModel {
+}*/
+class Reputation extends EnhancedModel {
 	static get schema() {
 		return {
 			user: {
@@ -52,10 +52,11 @@ class ReputationDelta extends EnhancedModel {
 	}
 	static get initOptions() {
 		return {
-			modelName: "ReputationDelta"
+			modelName: "Reputation",
+			tableName: "Reputation"
 		}
 	}
 }
 
 module.exports.Reputation = Reputation;
-module.exports.ReputationDelta = ReputationDelta;
+//module.exports.Rep = Rep;

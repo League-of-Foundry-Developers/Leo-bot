@@ -3,7 +3,7 @@ const Discord = require("discord.js");
 const fetch = require("node-fetch");
 const { Sequelize } = require("sequelize");
 
-const { Reputation, ReputationDelta } = require("./database.js");
+const { Reputation } = require("./database.js");
 
 const sequelize = new Sequelize("sqlite:./leo.db");
 const client = new Discord.Client();
@@ -12,7 +12,7 @@ const debug = true;
 
 async function main() {
 	Reputation.init(sequelize);
-	ReputationDelta.init(sequelize);
+	//ReputationDelta.init(sequelize);
 
 	await client.login(token);
 }
@@ -209,7 +209,7 @@ async function handleRepCommand(interaction) {
 
 	console.log(sequelize.query);
 	const [data, metaData] = await sequelize.query(`SELECT \`user\`, SUM(delta) FROM ReputationDelta WHERE \`USER\`="${userTag}";`);
-	const score = data[0]["SUM(delta)"];
+	const score = data[0]["SUM(delta)"] ?? 0;
 
 	console.log(userId, user, amount, reason, data);
 

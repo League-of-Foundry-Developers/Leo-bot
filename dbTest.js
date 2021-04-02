@@ -1,18 +1,18 @@
 //import DB from "sequelize";
-const { Reputation, ReputationDelta } = require("./database.js");
+const { Reputation } = require("./database.js");
 const { Sequelize } = require("sequelize");
 const sequelize = new Sequelize("sqlite:./leo.db");
 
 async function main(d) {
 	Reputation.init(sequelize);
-	ReputationDelta.init(sequelize);
+//	ReputationDelta.init(sequelize);
 
-//	await Reputation.sync({ alter: true });
+	await Reputation.sync({ alter: true });
 //	await ReputationDelta.sync({ alter: true });
 
 //	await insertData(d);
 
-	let delta = await ReputationDelta.create({
+	let delta = await Reputation.create({
 		user: "zeel#4200",
 		delta: 1
 	});
@@ -22,7 +22,7 @@ async function main(d) {
 
 async function insertData(data) {
 	for (let row of data) {
-		await ReputationDelta.create({
+		await Reputation.create({
 			user: row.userName,
 			delta: row.score
 		})
