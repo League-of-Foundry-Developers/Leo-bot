@@ -2,7 +2,7 @@ const { mainToken, token, testGuild, darkGuild } = require("./config.json");
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
-const dev = true;
+const dev = process.argv[2] == "true";
 
 async function main() {
 	await client.login(dev ? token : mainToken);

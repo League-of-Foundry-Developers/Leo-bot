@@ -4,7 +4,11 @@
   "description": "League of Exaordinary Foundry VTT Developers Discord Bot",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bot": "node main.js",
+    "bot-dev": "node --trace-warnings --unhandled-rejections=strict main.js",
+    "setup-dev": "node createCommands.js true",
+    "setup-test": "node createCommands.js false"
   },
   "author": "zeel",
   "license": "MIT",
