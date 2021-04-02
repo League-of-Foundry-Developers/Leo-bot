@@ -20,6 +20,7 @@ async function main() {
 		"name": "package",
 		"description": "Get information about a Foundry VTT package."
 	}});
+	console.log("Created /package");
 
 	await client.api.applications(client.user.id).guilds(dev ? testGuild : darkGuild).commands.post({data: {
 		"options": [
@@ -41,6 +42,7 @@ async function main() {
 		"name": "say",
 		"description": "Have Leo speak for you."
 	}});
+	console.log("Created /say");
 
 	await client.api.applications(client.user.id).guilds(dev ? testGuild : darkGuild).commands.post({data: {
 		"options": [
@@ -69,6 +71,7 @@ async function main() {
 		"name": "giverep",
 		"description": "Give another user League Points"
 	}});
+	console.log("Created /giverep");
 
 	await client.api.applications(client.user.id).guilds(dev ? testGuild : darkGuild).commands.post({data: {
 		"options": [
@@ -83,6 +86,7 @@ async function main() {
 		"name": "rep",
 		"description": "Check how much reputation a user has."
 	}});
+	console.log("Created /rep");
 
 
 	process.exit();
