@@ -1,9 +1,21 @@
 const { token } = require("./config.json");
 const Discord = require("discord.js");
 const fetch = require("node-fetch");
+const { Sequelize } = require("sequelize");
+
+const { Reputation, ReputationDelta } = require("./database.js");
+
+const sequelize = new Sequelize("sqlite:./leo.db");
 const client = new Discord.Client();
 
 const debug = true;
+
+async function main() {
+	Reputation.init(sequelize);
+	ReputationDelta.init(sequelize);
+
+	await client.login(token);
+}
 
 client.once("ready", () => {
 	console.log("Ready!");
@@ -133,9 +145,31 @@ async function getPackage(name) {
 }
 
 client.ws.on('INTERACTION_CREATE', async interaction => {
-	//console.log(interaction);
+	console.log(interaction);
 	console.log(interaction.data.options);
 
+	try {
+		switch (interaction.data.name) {
+			case "package": await handlePackageCommand(interaction); break;
+			case "say": await handleSayCommand(interaction); break;
+			case "giverep":
+			case "rep": await handleRepCommand(interaction); break;
+			default: {
+				await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
+					type: 4,
+					data: {
+						content: "Command not recognized."
+					}
+				}});
+			}
+		}
+	}
+	catch(e) {
+		console.error(e);
+	}
+})
+
+async function handlePackageCommand(interaction) {
 	const name = interaction.data.options.find(o => o.name == "name")?.value;
 	console.log(`Package Name: ${name}`);
 
@@ -143,6 +177,50 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
 		type: 4,
 		data: await getPackageResponse(name)
 	}});
-})
+}
+async function handleSayCommand(interaction) {
+	console.log(client.channels);
+	const channel = interaction.data.options.find(o => o.name == "channel")?.value;
+	const message = interaction.data.options.find(o => o.name == "message")?.value;
 
-client.login(token);
+	console.log(`
+		Sending message on channel: ${channel}
+		> ${message}
+	`);
+
+	await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
+		type: 4,
+		data: {
+			content: `Sending message to ${channel}`
+		}
+	}});
+
+	const ch = await client.channels.fetch(channel);
+	ch.send(message);
+}
+
+async function handleRepCommand(interaction) {
+	const userId = interaction.data.options.find(o => o.name == "user")?.value;
+	const amount = interaction.data.options.find(o => o.name == "amount")?.value;
+	const reason = interaction.data.options.find(o => o.name == "reason")?.value;
+
+	const user = await client.users.fetch(userId);
+	const userTag = `${user.username}#${user.discriminator}`;
+
+	console.log(sequelize.query);
+	const [data, metaData] = await sequelize.query(`SELECT \`user\`, SUM(delta) FROM ReputationDelta WHERE \`USER\`="${userTag}";`);
+	const score = data[0]["SUM(delta)"];
+
+	console.log(userId, user, amount, reason, data);
+
+	
+	await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
+		type: 4,
+		data: {
+			content: `${userTag} has ${score} points.`
+		}
+	}});
+}
+
+
+main();
