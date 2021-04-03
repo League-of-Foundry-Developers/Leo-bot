@@ -2,8 +2,10 @@ const { token } = require("./config.json");
 const Discord = require("discord.js");
 const fetch = require("node-fetch");
 const { Sequelize } = require("sequelize");
+const columnify = require('columnify')
 
-const { Reputation } = require("./database.js");
+const { Reputation, Score } = require("./database.js");
+const { Op } = require("sequelize");
 
 const sequelize = new Sequelize("sqlite:./leo.db");
 const client = new Discord.Client();
@@ -12,7 +14,7 @@ const debug = true;
 
 async function main() {
 	Reputation.init(sequelize);
-	//ReputationDelta.init(sequelize);
+	Score.init(sequelize);
 
 	await client.login(token);
 }
@@ -200,27 +202,117 @@ async function handleSayCommand(interaction) {
 }
 
 async function handleRepCommand(interaction) {
-	const userId = interaction.data.options.find(o => o.name == "user")?.value;
-	const amount = interaction.data.options.find(o => o.name == "amount")?.value;
-	const reason = interaction.data.options.find(o => o.name == "reason")?.value;
+	const subcommand = interaction.data.options.find(o => o.type == 1);
+
+	switch (subcommand.name) {
+		case "give": await giveRep(interaction, subcommand.options); break;
+		case "check": await checkRep(interaction, subcommand.options); break;
+		case "scoreboard": await getScoreboard(interaction); break;
+	}
+}
+
+async function checkRep(interaction, options) {
+	const userId = options.find(o => o.name == "user")?.value;
 
 	const user = await client.users.fetch(userId);
 	const userTag = `${user.username}#${user.discriminator}`;
 
-	console.log(sequelize.query);
-	const [data, metaData] = await sequelize.query(`SELECT \`user\`, SUM(delta) FROM ReputationDelta WHERE \`USER\`="${userTag}";`);
-	const score = data[0]["SUM(delta)"] ?? 0;
+	const score = await Score.findOne({
+		where: { user: userTag }
+	});
 
-	console.log(userId, user, amount, reason, data);
+	const message = `**${user.username}: ${score.score}** LeaguePoints™️ (#**${score.rank}**)`;
 
-	
+	console.log(`
+> /rep check user:${userTag}
+=> ${message}
+`);
+
 	await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
 		type: 4,
 		data: {
-			content: `${userTag} has ${score} points.`
+			content: message
 		}
 	}});
 }
 
+async function giveRep(interaction, options) {
+	const userId = options.find(o => o.name == "user")?.value;
+	const amount = options.find(o => o.name == "amount")?.value || 1;
+	const reason = options.find(o => o.name == "reason")?.value || null;
+
+	const user = await client.users.fetch(userId);
+	const userTag = `${user.username}#${user.discriminator}`;
+
+
+	const delta = await Reputation.create({
+		user: userTag,
+		delta: amount,
+		reason: reason,
+		giverId: interaction.member.user.id,
+		channelId: interaction.channel_id,
+		messageId: interaction.id
+	});
+	const score = await Score.findOne({
+		where: { user: userTag }
+	}) || { score: 0, rank: 0 };
+
+	const response = await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
+		type: 4,
+		data: {
+			content: `Gave \`${amount}\` ️LeaguePoints™️ to **${user.username}** ${reason ? `because ${reason}` : ""} (current: \`#${score.rank}\` - \`${score.score}\`)`
+		}
+	}});
+
+	console.log(response);
+
+	// delta.messageId = "";
+	// await delta.save();
+}
+
+async function getScoreboard(interaction) {
+	const scores = await Reputation.findAll({
+		attributes: [
+			"user",
+			[sequelize.fn("sum", sequelize.col("delta")), "sum"]
+		],
+		group: "user",
+		order: [sequelize.literal("`sum` DESC")],
+		limit: 10,
+		offset: 0
+	})
+	
+	await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
+		type: 4,
+		data: {
+			content: `Reputation Scoreboard:`,
+			embeds: [await getScoreboardEmbed(scores)]
+		}
+	}});
+}
+
+async function getScoreboardEmbed(scores) {
+	const board = scores.map((s, i) => ({
+		"- Rank -": `#${i+1}`,
+		"- Points -": s.dataValues.sum,
+		"- User -": s.dataValues.user
+	}));
+
+	const message = columnify(board, {
+		columnSplitter: " | ",
+		config: {
+			"- Rank -": { align: "center" },
+			"- Points -": { align: "right" }
+		}
+	});	
+
+	console.log(message);
+
+	return {
+		color: 0xff6400,
+		title: "Scoreboard",
+		description: "```\n" + message + "\n```"
+	}
+}
 
 main();
