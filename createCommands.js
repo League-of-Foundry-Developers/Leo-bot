@@ -74,17 +74,54 @@ async function main() {
 	console.log("Created /giverep");
 
 	await client.api.applications(client.user.id).guilds(dev ? testGuild : darkGuild).commands.post({data: {
-		"options": [
-			{
-				"type": 6,
-				"name": "user",
-				"description": "Who's reputation would you like to check?",
-				"default": false,
-				"required": true
-			}
-		],
 		"name": "rep",
-		"description": "Check how much reputation a user has."
+		"description": "Manage user reputation.",
+		"options": [
+			{	
+				"name": "check",
+				"description": "Check how many reputation a user has.",
+				"default": true,
+				"type": 1,
+				"options": [
+					{
+						"type": 6,
+						"name": "user",
+						"description": "Who's reputation would you like to check?",
+						"required": true
+					}
+				],
+			},
+			{	
+				"name": "give",
+				"description": "Give another user reputation.",
+				"type": 1,
+				"options": [
+					{
+						"type": 6,
+						"name": "user",
+						"description": "Who would you like to give reputation to?",
+						"required": true
+					},
+					{
+						"type": 4,
+						"name": "amount",
+						"description": "How much reputation would you like to give?",
+						"required": false
+					},
+					{
+						"type": 3,
+						"name": "reason",
+						"description": "Why are you giving them reputation?",
+						"required": false
+					}
+				]
+			},
+			{	
+				"name": "scoreboard",
+				"description": "Display the reputation scoreboard.",
+				"type": 1,
+			}
+		]
 	}});
 	console.log("Created /rep");
 
