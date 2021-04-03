@@ -269,16 +269,12 @@ async function giveRep(interaction, options) {
 
 async function getScoreboard(interaction) {
 	let scores = await Score.findAll({
+		raw: true,
 		attributes: ["rank", "score", "user"],
 		order: [["rank", "ASC"]],
 		limit: 10,
 		offset: 0
 	})
-	scores = scores.map(s => ({
-		rank: s.rank,
-		score: s.score,
-		user: s.user
-	}));
 
 	for (let score of scores) {
 		let user = await client.users.fetch(score.user);
