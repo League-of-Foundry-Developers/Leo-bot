@@ -24,12 +24,41 @@ client.once("ready", () => {
 });
 
 client.on("message", message => {
-//	if (debug) console.log(message);
-
 	if (message.author.bot) return;
+	if (debug) console.log(message);
+
+	thankYou(message);
+
 	if (message.content.startsWith("echo ")) 
 		message.channel.send(message.content.slice(4));
 });
+
+async function thankYou(message) {
+	const tests = [
+		m => /(?<![A-z])thanks?(?![A-z])/gi.test(m.content),
+		m => /(?<![A-z])tyvm(?![A-z])/gi.test(m.content),
+		m => /(?<![A-z])points? (?:to|for) <@(?![A-z])/gi.test(m.content),
+		m => /:vote:/gi.test(m.content)
+	];
+	if (!tests.some(test=> test(message))) return;
+
+	for (let user of message.mentions.users) {
+		thanksGiver(user[1], message);
+	}
+}
+
+async function thanksGiver(user, message) {
+	const delta = await Reputation.create({
+		user: user.id,
+		delta: 1,
+		reason: message.content,
+		giverId: message.author.id,
+		channelId: message.channel.id,
+		messageId: message.id
+	});
+
+	message.channel.send(`Gave <:${config.emotes.plusone.name}:${config.emotes.plusone.id}> ${config.points.name} to <@!${user.id}>`);
+}
 
 async function getPackageResponse(name) {
 	const pkg = await getPackage(name);
