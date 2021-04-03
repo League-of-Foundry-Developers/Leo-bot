@@ -1,4 +1,4 @@
-const { token } = require("./config.json");
+const config = require(process.argv[2]);
 const Discord = require("discord.js");
 const fetch = require("node-fetch");
 const { Sequelize } = require("sequelize");
@@ -16,7 +16,7 @@ async function main() {
 	Reputation.init(sequelize);
 	Score.init(sequelize);
 
-	await client.login(token);
+	await client.login(config.token);
 }
 
 client.once("ready", () => {

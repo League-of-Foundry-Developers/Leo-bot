@@ -5,8 +5,8 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "bot": "node main.js",
-    "bot-dev": "node --trace-warnings --unhandled-rejections=strict main.js",
+    "bot": "node main.js ./config.json",
+    "bot-dev": "node --trace-warnings --unhandled-rejections=strict main.js ./config.json",
     "setup-dev": "node createCommands.js true",
     "setup-test": "node createCommands.js false",
     "db-init": "node dbInit.js leo.db"
