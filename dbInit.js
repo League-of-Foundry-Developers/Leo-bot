@@ -1,4 +1,4 @@
-const { Reputation } = require("./database.js");
+const { Reputation, Score } = require("./database.js");
 const { Sequelize } = require("sequelize");
 
 const sequelize = new Sequelize({
@@ -8,8 +8,10 @@ const sequelize = new Sequelize({
 
 async function main() {
 	Reputation.init(sequelize);
+	Score.init(sequelize);
 
 	await Reputation.sync({ alter: true });
+	await Score.sync({ alter: true });
 }
 
 main();
