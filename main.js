@@ -215,16 +215,15 @@ async function checkRep(interaction, options) {
 	const userId = options.find(o => o.name == "user")?.value;
 
 	const user = await client.users.fetch(userId);
-	const userTag = `${user.username}#${user.discriminator}`;
 
 	const score = await Score.findOne({
-		where: { user: userTag }
+		where: { user: userId }
 	});
 
 	const message = `**${user.username}: ${score.score}** LeaguePoints™️ (#**${score.rank}**)`;
 
 	console.log(`
-> /rep check user:${userTag}
+> /rep check user:${user.username}
 => ${message}
 `);
 
@@ -242,11 +241,9 @@ async function giveRep(interaction, options) {
 	const reason = options.find(o => o.name == "reason")?.value || null;
 
 	const user = await client.users.fetch(userId);
-	const userTag = `${user.username}#${user.discriminator}`;
-
 
 	const delta = await Reputation.create({
-		user: userTag,
+		user: userId,
 		delta: amount,
 		reason: reason,
 		giverId: interaction.member.user.id,
@@ -254,7 +251,7 @@ async function giveRep(interaction, options) {
 		messageId: interaction.id
 	});
 	const score = await Score.findOne({
-		where: { user: userTag }
+		where: { user: userId }
 	}) || { score: 0, rank: 0 };
 
 	const response = await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
@@ -271,16 +268,22 @@ async function giveRep(interaction, options) {
 }
 
 async function getScoreboard(interaction) {
-	const scores = await Reputation.findAll({
-		attributes: [
-			"user",
-			[sequelize.fn("sum", sequelize.col("delta")), "sum"]
-		],
-		group: "user",
-		order: [sequelize.literal("`sum` DESC")],
+	let scores = await Score.findAll({
+		attributes: ["rank", "score", "user"],
+		order: [["rank", "ASC"]],
 		limit: 10,
 		offset: 0
 	})
+	scores = scores.map(s => ({
+		rank: s.rank,
+		score: s.score,
+		user: s.user
+	}));
+
+	for (let score of scores) {
+		let user = await client.users.fetch(score.user);
+		score.user = `${user?.username}#${user?.discriminator}`;
+	}
 	
 	await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
 		type: 4,
@@ -293,9 +296,9 @@ async function getScoreboard(interaction) {
 
 async function getScoreboardEmbed(scores) {
 	const board = scores.map((s, i) => ({
-		"- Rank -": `#${i+1}`,
-		"- Points -": s.dataValues.sum,
-		"- User -": s.dataValues.user
+		"- Rank -": `#${s.rank}`,
+		"- Points -": s.score,
+		"- User -": s.user
 	}));
 
 	const message = columnify(board, {
