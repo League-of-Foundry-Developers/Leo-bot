@@ -205,7 +205,7 @@ async function handleRepCommand(interaction) {
 	const subcommand = interaction.data.options.find(o => o.type == 1);
 
 	switch (subcommand.name) {
-		case "give": await giveRep(interaction, subcommand.options); break;
+		case "give": await giveRepCommand(interaction, subcommand.options); break;
 		case "check": await checkRep(interaction, subcommand.options); break;
 		case "scoreboard": await getScoreboard(interaction); break;
 	}
@@ -220,7 +220,7 @@ async function checkRep(interaction, options) {
 		where: { user: userId }
 	});
 
-	const message = `**${user.username}: ${score.score}** LeaguePoints™️ (#**${score.rank}**)`;
+	const message = `**${user.username}: ${score.score}** ${config.points.name} (#**${score.rank}**)`;
 
 	console.log(`
 > /rep check user:${user.username}
@@ -235,7 +235,7 @@ async function checkRep(interaction, options) {
 	}});
 }
 
-async function giveRep(interaction, options) {
+async function giveRepCommand(interaction, options) {
 	const userId = options.find(o => o.name == "user")?.value;
 	const amount = options.find(o => o.name == "amount")?.value || 1;
 	const reason = options.find(o => o.name == "reason")?.value || null;
@@ -257,7 +257,7 @@ async function giveRep(interaction, options) {
 	const response = await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
 		type: 4,
 		data: {
-			content: `Gave \`${amount}\` ️LeaguePoints™️ to **${user.username}** ${reason ? `because ${reason}` : ""} (current: \`#${score.rank}\` - \`${score.score}\`)`
+			content: `Gave \`${amount}\` ️${config.points.name} to **${user.username}** ${reason ? `because ${reason}` : ""} (current: \`#${score.rank}\` - \`${score.score}\`)`
 		}
 	}});
 
@@ -266,6 +266,7 @@ async function giveRep(interaction, options) {
 	// delta.messageId = "";
 	// await delta.save();
 }
+
 
 async function getScoreboard(interaction) {
 	let scores = await Score.findAll({
