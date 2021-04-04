@@ -8,7 +8,7 @@ const { Reputation, Score } = require("./database.js");
 const { Op } = require("sequelize");
 
 const sequelize = new Sequelize("sqlite:./leo.db");
-const client = new Discord.Client();
+const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
 
 const debug = true;
 
@@ -32,6 +32,37 @@ client.on("message", message => {
 	if (message.content.startsWith("echo ")) 
 		message.channel.send(message.content.slice(4));
 });
+
+client.on("messageReactionAdd", async (reaction, user) => {
+	if (!await fetchPartial(reaction)) return;
+
+	switch (reaction._emoji.id) {
+		case config.emotes.plusone.id: await reactionGiveRep(reaction, user);
+	}
+});
+
+async function reactionGiveRep(reaction, user) {
+	const delta = await Reputation.create({
+		user: user.id,
+		delta: 1,
+		reason: "Reaction +1",
+		giverId: user.id,
+		channelId: reaction.message.channel.id,
+		messageId: reaction.message.id
+	});
+
+	reaction.message.channel.send(`Gave <:${config.emotes.plusone.name}:${config.emotes.plusone.id}> ${config.points.name} to <@!${reaction.message.author.id}>`);
+}
+
+async function fetchPartial(data) {
+	if (data.partial) {
+		try { await data.fetch(); } catch (error) {
+			console.error('Something went wrong when fetching this partial: ', error);
+			return false;
+		}
+	}
+	return true;
+}
 
 async function thankYou(message) {
 	const tests = [
