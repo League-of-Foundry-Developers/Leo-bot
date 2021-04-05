@@ -198,10 +198,59 @@ class ReputationManager {
 	}
 
 	async scoreboardCommand(interaction, options) {
-		return;
+		const message = `Reputation Scoreboard:`;
+		const scoreboard = await this.getScoreboardPage((options?.page - 1) * 10 || 0);
+
+		const response = await this.bot.respond(interaction, {
+			content: message,
+			embeds: [scoreboard]
+		});
+
+		console.log(message);
+		console.log(scoreboard.description);
+		return response;
+	}
+
+	async getScoreboardPage(page) {
+		const scores = await Score.findAll({
+			attributes: ["rank", "score", "user"],
+			order: [["rank", "ASC"]],
+			offset: page,
+			limit: 10, raw: true
+		})
+
+		for (let score of scores) {
+			let user = await this.client.users.fetch(score.user);
+			score.user = `${user?.username}#${user?.discriminator}`;
+		}
+
+		return await this.getScoreboardEmbed(scores);
+	}
+
+	getScoreboardEmbed(scores) {
+		const board = scores.map((s, i) => ({
+			"- Rank -": `#${s.rank}`,
+			"- Points -": s.score,
+			"- User -": s.user
+		}));
+
+		const message = columnify(board, {
+			columnSplitter: " | ",
+			config: {
+				"- Rank -": { align: "center" },
+				"- Points -": { align: "right" }
+			}
+		});	
+
+		return {
+			color: 0xff6400,
+			title: "Scoreboard",
+			description: "```\n" + message + "\n```"
+		}
 	}
 
 	extractOptions(command) {
+		if (!command.options) return null;
 		return command.options.reduce((options, option) => {
 			options[option.name] = option.value; 
 			return options;
