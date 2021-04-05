@@ -1,6 +1,11 @@
 const fetch = require("node-fetch");
 const { ReputationManager } = require("./classes/ReputationManager.js");
 
+/**
+ * The League of Extraordinary Foundry VTT Developers Discord Bot
+ *
+ * @class Leo
+ */
 class Leo {
 	constructor(config, sql, client) {
 		this.config = config;
@@ -38,7 +43,9 @@ class Leo {
 		if (message.author.bot) return;
 		this.debug(message);
 		
-		this.reputation.handleMessage(message);
+		await Promise.all([
+			this.reputation.handleMessage(message)
+		]);
 	}
 	async onMessageReactionAdd(reaction, user) {
 		if (!await this.fetchPartial(reaction)) return;

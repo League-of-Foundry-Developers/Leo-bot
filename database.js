@@ -76,6 +76,25 @@ class Score extends View {
 		}
 	}
 }
+
+/**
+ * @typedef {Object} ReputationData
+ *
+ * @property {string} user
+ * @property {number} delta
+ * @property {string} [reason]
+ * @property {string} [channelId]
+ * @property {string} [messageId]
+ * @property {string} [giverId]
+ * @property {string} [createdAt]
+ * @property {string} [updatedAt]
+ */
+/**
+ * A Model to manage one entry in the Reputation table
+ *
+ * @class Reputation
+ * @extends {EnhancedModel}
+ */
 class Reputation extends EnhancedModel {
 	static get schema() {
 		return {
@@ -83,7 +102,10 @@ class Reputation extends EnhancedModel {
 				type: DataTypes.STRING,
 				allowNull: false
 			},
-			delta: DataTypes.INTEGER,
+			delta: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+			},
 			reason: DataTypes.STRING,
 			channelId: DataTypes.STRING,
 			messageId: DataTypes.STRING,

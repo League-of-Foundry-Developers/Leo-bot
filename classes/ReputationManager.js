@@ -1,7 +1,24 @@
-const { Reputation, Score } = require("./database.js");
 const columnify = require('columnify');
+const { Reputation, Score } = require("../database.js");
+
+/**
+ * @typedef {import("../Leo.js").Leo} Leo 
+ * 
+ * @typedef {import("discord.js").MessageReaction} MessageReaction
+ * @typedef {import("discord.js").Message} Message
+ * @typedef {import("discord.js").User}    User
+ * @typedef {import("discord.js").Channel} Channel
+ *
+ * @typedef {import("../database.js").ReputationData} ReputationData
+ */
 
 class ReputationManager {
+	/**
+	 * Creates an instance of ReputationManager.
+	 *
+	 * @param {Leo} bot - The instance of Leo to which this manager belongs
+	 * @memberof ReputationManager
+	 */
 	constructor (bot) {
 		this.bot = bot;
 	}
@@ -10,15 +27,30 @@ class ReputationManager {
 	get client() { return this.bot.client; } 
 	get sql()    { return this.bot.sql;    }
 
+	/**
+	 * Initialize required members and structures for ReputationManager
+	 *
+	 * @memberof ReputationManager
+	 */
 	async init() {
 		Reputation.init(this.sql);
 		Score.init(this.sql);
 	}
 
+	/**
+	 * Handle event generated when a user reacts to a message,
+	 * if the reaction is the +1 emoji, give the author of the
+	 * message a point of rep.
+	 *
+	 * @param {MessageReaction} reaction - A reaction made on a message
+	 * @param {User}            user     - The user that reacted to the message
+	 * @return {Reputation|void}           Returns early if any other reaction, or the new Reputation database Model
+	 * @memberof ReputationManager
+	 */
 	async handleReaction(reaction, user) {
 		if (reaction._emoji.id != this.config.emotes.plusone.id) return;
 
-		await this.giveRep({
+		return await this.giveRep({
 			user: reaction.message.author.id,
 			delta: 1,
 			reason: "Reaction +1",
@@ -78,10 +110,19 @@ class ReputationManager {
 			messageId: message.id
 		});
 	}
+
 	async handleInteraction() {
 
 	}
 
+	/**
+	 * Give a user reputation, then send a message to Discord alerting them to this action
+	 *
+	 * @param {ReputationData} data         - The data used to add reputation to the database
+	 * @param {Channel|undefined} channel   - The channel where reputation was added
+	 * @return {[Reputation, Message|null]}   The newly created Reputation row and new response Meassage
+	 * @memberof ReputationManager
+	 */
 	async giveRep(data, channel) {
 		const delta = await Reputation.create(data);
 
