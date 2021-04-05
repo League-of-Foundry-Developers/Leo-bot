@@ -18,7 +18,7 @@ class Leo {
 	async init() {
 		await this.reputation.init();
 		await this.createListeners();
-		await client.login(this.config.token);
+		await this.client.login(this.config.token);
 	}
 
 	debug(...args) {
@@ -55,7 +55,9 @@ class Leo {
 		]);
 	}
 	async onInteractionCreate(interaction) {
-
+		await Promise.all([
+			this.reputation.handleInteraction(interaction)
+		]);
 	}
 
 	async createListeners() {
@@ -63,7 +65,7 @@ class Leo {
 		this.client.on("message", this.onMessage.bind(this));
 		this.client.on("messageReactionAdd", this.onMessageReactionAdd.bind(this));
 
-		client.ws.on('INTERACTION_CREATE', this.onInteractionCreate.bind(this));
+		this.client.ws.on('INTERACTION_CREATE', this.onInteractionCreate.bind(this));
 	}
 }
 
