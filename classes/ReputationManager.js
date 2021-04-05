@@ -151,33 +151,33 @@ class ReputationManager {
 		const user = await this.client.users.fetch(options.user);
 
 		const delta = await Reputation.create({
-			user: options.user,
+			user: user.id,
 			delta: options.amount || 1,
 			reason: options.reason || null,
 			giverId: interaction.member.user.id,
 			channelId: interaction.channel_id,
 			messageId: interaction.id
 		});
+
 		const score = await Score.findOne({
-			where: { user: options.user }
+			where: { user: user.id }
 		}) || { score: 0, rank: 0 };
 
-		const response = await this.client.api.interactions(interaction.id, interaction.token).callback.post({data: {
-			type: 4,
-			data: {
-				content: this.buildRepResponse(delta, {
-					sender: interaction.member.user,
-					receiver: user,
-					giveReason: delta.reason
-				}),
-				allowed_mentions: {
-					"users": [delta.user]
-  				}
-			}
-		}});
+		const message = this.buildRepResponse(delta, {
+			sender: interaction.member.user,
+			receiver: user,
+			giveReason: delta.reason
+		})
 
-		console.log(response);
+		const response = await this.bot.respond(interaction, {
+			content: message,
+			allowed_mentions: { "users": [user.id] }
+		});
+
+		console.log(message);
+		return response;
 	}
+
 	async checkCommand(interaction, options) {
 		return;
 	}
