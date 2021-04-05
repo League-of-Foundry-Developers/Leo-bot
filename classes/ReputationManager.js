@@ -126,15 +126,45 @@ class ReputationManager {
 	async giveRep(data, channel) {
 		const delta = await Reputation.create(data);
 
-		const amount = data.delta == 1 
-			? `<:${config.emotes.plusone.name}:${config.emotes.plusone.id}>`
-			: data.delta;
+	/**
+	 * Constructs a response string for when reputation is given.
+	 *
+	 * @param {Reputation}  reputation
+	 * @param {object}      options             - An object of optional parameters
+	 * @param {User}       [options.sender]     - The user that gave the reputation
+	 * @param {User}       [options.receiver]   - The user that received the reputaion
+	 * @param {Channel}    [options.channel]    - The channel in which the reputation was given
+	 * @param {Message}    [options.message]    - The message to which the reputation was given
+	 * @param {Score}      [options.score]      - The current reputation stats for the receiver
+	 * @param {string}     [options.giveReason] - A reason why the giver gave the receiver points
+	 * @return {string}                          The message responding to the reputation giving event
+	 * @memberof ReputationManager
+	 */
+	buildRepResponse(reputation, { sender, receiver, channel, message, score, giveReason }={}) {
+		const intro = sender ? `<@!${sender.id}> gave` : "Gave";
+		const sign = reputation.delta > 0 ? "+" : "";
+		const amount = reputation.delta == 1 // If the amount of rep given is one, use the +1 emote instead of a number to indicate the amount
+			? `<:${this.config.emotes.plusone.name}:${this.config.emotes.plusone.id}>`
+			: `${sign}${reputation.delta}`;
+		const recipient = `<@!${reputation.user}>`;
+		const stats = score ? ` (current: \`#${score.rank}\` - \`${score.score}\`)` : "";
+		const reason = giveReason ? ` Reason: \n> ${giveReason}` : "";
+		
+		return `${intro} ${amount} ${this.config.points.name} to ${recipient}.${stats}${reason}`;
+	}
 
-		const reply = channel ? await channel.send(
-			`Gave **${amount}** ${config.points.name} to <@!${data.user}>`
-		) : null;
-
-		return [delta, reply];
+	/**
+	 * Get's the Score of the specified user
+	 *
+	 * @param {string} userId - The Discord snowflake for the user
+	 * @return {Score}          The Score stats for that user
+	 * @memberof ReputationManager
+	 */
+	async getScore(userId) {
+		const score = await Score.findOne({
+			where: { user: userId }
+		});
+		return score  || { score: 0, rank: " No points" };
 	}
 }
 
