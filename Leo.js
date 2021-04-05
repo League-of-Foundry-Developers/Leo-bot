@@ -67,6 +67,12 @@ class Leo {
 
 		this.client.ws.on('INTERACTION_CREATE', this.onInteractionCreate.bind(this));
 	}
+
+	async respond(interaction, data) {
+		return await this.client.api
+			.interactions(interaction.id, interaction.token)
+			.callback.post({ data: { type: 4, data: data } });
+	}
 }
 
 module.exports.Leo = Leo;
