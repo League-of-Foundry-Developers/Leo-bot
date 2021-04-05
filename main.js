@@ -170,7 +170,7 @@ async function getPackage(name) {
 	}
 }
 
-client.ws.on('INTERACTION_CREATE', async interaction => {
+/*client.ws.on('INTERACTION_CREATE', async interaction => {
 	console.log(interaction);
 	console.log(interaction.data.options);
 
@@ -193,7 +193,7 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
 	catch(e) {
 		console.error(e);
 	}
-})
+})*/
 
 async function handlePackageCommand(interaction) {
 	const name = interaction.data.options.find(o => o.name == "name")?.value;
@@ -286,7 +286,7 @@ async function giveRepCommand(interaction, options) {
 		}
 	}});
 
-	console.log(response);
+	//console.log(response);
 
 	// delta.messageId = "";
 	// await delta.save();
