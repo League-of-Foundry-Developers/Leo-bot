@@ -27,6 +27,9 @@ class ReputationManager {
 	get client() { return this.bot.client; } 
 	get sql()    { return this.bot.sql;    }
 
+	/** @type {object} Message options to disable pings @readonly  */
+	get noPing() { return { "allowedMentions": { "parse": [], "repliedUser": false } }; }
+
 	/**
 	 * Initialize required members and structures for ReputationManager
 	 *
@@ -71,8 +74,10 @@ class ReputationManager {
 	async handleMessage(message) {
 		if (!this._testMessage(message)) return;
 
+		let first = true; // For the first user, Leo should reply to the message.
 		for (let user of message.mentions.users) {
-			await this._giveMessageRep(user[1], message);
+			await this._giveMessageRep(user[1], message, first);
+			first = false;
 		}
 	}
 
@@ -97,11 +102,12 @@ class ReputationManager {
 	 *
 	 * @param {User}    user    - The user receiving the reputation
 	 * @param {Message} message - The message in which the user is being "thanked" or otherwise awarded rep
+	 * @param {boolean} reply   - If true, send the message as a reply to the triggering message
 	 * @return {Reputation}       The new database entry Model
 	 * @memberof ReputationManager
 	 */
-	async _giveMessageRep(user, message) {
-		return await this.giveRep({
+	async _giveMessageRep(user, message, reply=false) {
+		const rep = await this.giveRep({
 			user: user.id,
 			delta: 1,
 			reason: message.content,
@@ -109,6 +115,20 @@ class ReputationManager {
 			channelId: message.channel.id,
 			messageId: message.id
 		});
+
+		const score = await this.getScore(rep.user);
+
+		const response = this.buildRepResponse(rep, {
+			sender: message.author,
+			receiver: user,
+			score: score
+		})
+
+		if  (reply) await message.reply(response, this.noPing);
+		else await message.channel.send(response, this.noPing);
+
+		return rep;
+	}
 	}
 
 	async handleInteraction() {
