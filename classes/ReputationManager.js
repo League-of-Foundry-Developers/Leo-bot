@@ -129,9 +129,61 @@ class ReputationManager {
 
 		return rep;
 	}
+
+	/**
+	 * Handles /slash command interactions.
+	 * Delegates the interaction to the appropriate subcommand,
+	 * a method with the form of subnameCommand(Interaction, subcommandOptions)
+	 *
+	 * @param {*} interaction
+	 * @return {*} 
+	 * @memberof ReputationManager
+	 */
+	async handleInteraction(interaction) {
+		if (interaction.data.name != "rep") return;
+
+		const sub = interaction.data.options.find(o => o.type == 1);
+		const handler = `${sub.name}Command`;
+		if (this[handler]) return await this[handler](interaction, this.extractOptions(sub));
 	}
 
-	async handleInteraction() {
+	async giveCommand(interaction, options) {
+		const user = await this.client.users.fetch(options.user);
+
+		const delta = await Reputation.create({
+			user: options.user,
+			delta: options.amount || 1,
+			reason: options.reason || null,
+			giverId: interaction.member.user.id,
+			channelId: interaction.channel_id,
+			messageId: interaction.id
+		});
+		const score = await Score.findOne({
+			where: { user: options.user }
+		}) || { score: 0, rank: 0 };
+
+		const response = await this.client.api.interactions(interaction.id, interaction.token).callback.post({data: {
+			type: 4,
+			data: {
+				content: this.buildRepResponse(delta, {
+					sender: interaction.member.user,
+					receiver: user,
+					giveReason: delta.reason
+				}),
+				allowed_mentions: {
+					"users": [delta.user]
+  				}
+			}
+		}});
+
+		console.log(response);
+	}
+	async checkCommand(interaction, options) {
+		return;
+	}
+	async scoreboardCommand(interaction, options) {
+		return;
+	}
 
 	extractOptions(command) {
 		return command.options.reduce((options, option) => {
