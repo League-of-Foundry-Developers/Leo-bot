@@ -2,10 +2,9 @@ const config = require(process.argv[2]);
 const Discord = require("discord.js");
 const fetch = require("node-fetch");
 const { Sequelize } = require("sequelize");
-const columnify = require('columnify')
+const columnify = require("columnify");
 
 const { Reputation, Score } = require("./database.js");
-const { Op } = require("sequelize");
 
 const sequelize = new Sequelize("sqlite:./leo.db");
 const client = new Discord.Client({
@@ -15,34 +14,13 @@ const client = new Discord.Client({
 
 const debug = true;
 
-async function main() {
-	Reputation.init(sequelize);
-	Score.init(sequelize);
+const { Leo } = require("./Leo.js");
 
-	await client.login(config.token);
+async function main() {
+	const leo = new Leo(config, sequelize, client);
+	await leo.init();
 }
 
-client.once("ready", () => {
-	console.log("Ready!");
-});
-
-client.on("message", message => {
-	if (message.author.bot) return;
-	if (debug) console.log(message);
-
-	thankYou(message);
-
-	if (message.content.startsWith("echo ")) 
-		message.channel.send(message.content.slice(4));
-});
-
-client.on("messageReactionAdd", async (reaction, user) => {
-	if (!await fetchPartial(reaction)) return;
-
-	switch (reaction._emoji.id) {
-		case config.emotes.plusone.id: await reactionGiveRep(reaction, user);
-	}
-});
 
 async function reactionGiveRep(reaction, user) {
 	const delta = await Reputation.create({
@@ -68,28 +46,11 @@ async function fetchPartial(data) {
 }
 
 async function thankYou(message) {
-	const tests = [
-		m => /(?<![A-z])thanks?(?![A-z])/gi.test(m.content),
-		m => /(?<![A-z])tyvm(?![A-z])/gi.test(m.content),
-		m => /(?<![A-z])points? (?:to|for) <@(?![A-z])/gi.test(m.content),
-		m => /:vote:/gi.test(m.content)
-	];
-	if (!tests.some(test=> test(message))) return;
 
-	for (let user of message.mentions.users) {
-		thanksGiver(user[1], message);
-	}
 }
 
 async function thanksGiver(user, message) {
-	const delta = await Reputation.create({
-		user: user.id,
-		delta: 1,
-		reason: message.content,
-		giverId: message.author.id,
-		channelId: message.channel.id,
-		messageId: message.id
-	});
+	const delta = await Reputation.create();
 
 	message.channel.send(`Gave <:${config.emotes.plusone.name}:${config.emotes.plusone.id}> ${config.points.name} to <@!${user.id}>`);
 }
@@ -218,7 +179,7 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
 			case "package": await handlePackageCommand(interaction); break;
 			case "say": await handleSayCommand(interaction); break;
 			case "giverep":
-			case "rep": await handleRepCommand(interaction); break;
+			case "rep": return; await handleRepCommand(interaction); break;
 			default: {
 				await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
 					type: 4,
@@ -265,13 +226,14 @@ async function handleSayCommand(interaction) {
 }
 
 async function handleRepCommand(interaction) {
-	const subcommand = interaction.data.options.find(o => o.type == 1);
+	return;
+		const subcommand = interaction.data.options.find(o => o.type == 1);
 
-	switch (subcommand.name) {
-		case "give": await giveRepCommand(interaction, subcommand.options); break;
-		case "check": await checkRep(interaction, subcommand.options); break;
-		case "scoreboard": await getScoreboard(interaction); break;
-	}
+		switch (subcommand.name) {
+			case "give": await giveRepCommand(interaction, subcommand.options); break;
+			case "check": await checkRep(interaction, subcommand.options); break;
+			case "scoreboard": await getScoreboard(interaction); break;
+		}
 }
 
 async function checkRep(interaction, options) {
