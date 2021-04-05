@@ -20,40 +20,6 @@ async function main() {
 	await leo.init();
 }
 
-
-async function reactionGiveRep(reaction, user) {
-	const delta = await Reputation.create({
-		user: user.id,
-		delta: 1,
-		reason: "Reaction +1",
-		giverId: user.id,
-		channelId: reaction.message.channel.id,
-		messageId: reaction.message.id
-	});
-
-	reaction.message.channel.send(`Gave <:${config.emotes.plusone.name}:${config.emotes.plusone.id}> ${config.points.name} to <@!${reaction.message.author.id}>`);
-}
-
-async function fetchPartial(data) {
-	if (data.partial) {
-		try { await data.fetch(); } catch (error) {
-			console.error('Something went wrong when fetching this partial: ', error);
-			return false;
-		}
-	}
-	return true;
-}
-
-async function thankYou(message) {
-
-}
-
-async function thanksGiver(user, message) {
-	const delta = await Reputation.create();
-
-	message.channel.send(`Gave <:${config.emotes.plusone.name}:${config.emotes.plusone.id}> ${config.points.name} to <@!${user.id}>`);
-}
-
 async function getPackageResponse(name) {
 	const pkg = await getPackage(name);
 	const package = pkg.package;
@@ -169,31 +135,6 @@ async function getPackage(name) {
 	}
 }
 
-/*client.ws.on('INTERACTION_CREATE', async interaction => {
-	console.log(interaction);
-	console.log(interaction.data.options);
-
-	try {
-		switch (interaction.data.name) {
-			case "package": await handlePackageCommand(interaction); break;
-			case "say": await handleSayCommand(interaction); break;
-			case "giverep":
-			case "rep": return; await handleRepCommand(interaction); break;
-			default: {
-				await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
-					type: 4,
-					data: {
-						content: "Command not recognized."
-					}
-				}});
-			}
-		}
-	}
-	catch(e) {
-		console.error(e);
-	}
-})*/
-
 async function handlePackageCommand(interaction) {
 	const name = interaction.data.options.find(o => o.name == "name")?.value;
 	console.log(`Package Name: ${name}`);
@@ -222,121 +163,6 @@ async function handleSayCommand(interaction) {
 
 	const ch = await client.channels.fetch(channel);
 	ch.send(message);
-}
-
-async function handleRepCommand(interaction) {
-	return;
-		const subcommand = interaction.data.options.find(o => o.type == 1);
-
-		switch (subcommand.name) {
-			case "give": await giveRepCommand(interaction, subcommand.options); break;
-			case "check": await checkRep(interaction, subcommand.options); break;
-			case "scoreboard": await getScoreboard(interaction); break;
-		}
-}
-
-async function checkRep(interaction, options) {
-	const userId = options.find(o => o.name == "user")?.value;
-
-	const user = await client.users.fetch(userId);
-
-	const score = await Score.findOne({
-		where: { user: userId }
-	});
-
-	const message = `**${user.username}: ${score.score}** ${config.points.name} (#**${score.rank}**)`;
-
-	console.log(`
-> /rep check user:${user.username}
-=> ${message}
-`);
-
-	await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
-		type: 4,
-		data: {
-			content: message
-		}
-	}});
-}
-
-async function giveRepCommand(interaction, options) {
-	const userId = options.find(o => o.name == "user")?.value;
-	const amount = options.find(o => o.name == "amount")?.value || 1;
-	const reason = options.find(o => o.name == "reason")?.value || null;
-
-	const user = await client.users.fetch(userId);
-
-	const delta = await Reputation.create({
-		user: userId,
-		delta: amount,
-		reason: reason,
-		giverId: interaction.member.user.id,
-		channelId: interaction.channel_id,
-		messageId: interaction.id
-	});
-	const score = await Score.findOne({
-		where: { user: userId }
-	}) || { score: 0, rank: 0 };
-
-	const response = await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
-		type: 4,
-		data: {
-			content: `Gave \`${amount}\` ️${config.points.name} to **${user.username}** ${reason ? `because ${reason}` : ""} (current: \`#${score.rank}\` - \`${score.score}\`)`
-		}
-	}});
-
-	//console.log(response);
-
-	// delta.messageId = "";
-	// await delta.save();
-}
-
-
-async function getScoreboard(interaction) {
-	let scores = await Score.findAll({
-		raw: true,
-		attributes: ["rank", "score", "user"],
-		order: [["rank", "ASC"]],
-		limit: 10,
-		offset: 0
-	})
-
-	for (let score of scores) {
-		let user = await client.users.fetch(score.user);
-		score.user = `${user?.username}#${user?.discriminator}`;
-	}
-	
-	await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
-		type: 4,
-		data: {
-			content: `Reputation Scoreboard:`,
-			embeds: [await getScoreboardEmbed(scores)]
-		}
-	}});
-}
-
-async function getScoreboardEmbed(scores) {
-	const board = scores.map((s, i) => ({
-		"- Rank -": `#${s.rank}`,
-		"- Points -": s.score,
-		"- User -": s.user
-	}));
-
-	const message = columnify(board, {
-		columnSplitter: " | ",
-		config: {
-			"- Rank -": { align: "center" },
-			"- Points -": { align: "right" }
-		}
-	});	
-
-	console.log(message);
-
-	return {
-		color: 0xff6400,
-		title: "Scoreboard",
-		description: "```\n" + message + "\n```"
-	}
 }
 
 main();
