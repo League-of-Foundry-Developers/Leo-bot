@@ -113,18 +113,23 @@ class ReputationManager {
 
 	async handleInteraction() {
 
+	extractOptions(command) {
+		return command.options.reduce((options, option) => {
+			options[option.name] = option.value; 
+			return options;
+		}, {});
 	}
 
 	/**
-	 * Give a user reputation, then send a message to Discord alerting them to this action
+	 * Give a user reputation based on data.
 	 *
-	 * @param {ReputationData} data         - The data used to add reputation to the database
-	 * @param {Channel|undefined} channel   - The channel where reputation was added
-	 * @return {[Reputation, Message|null]}   The newly created Reputation row and new response Meassage
+	 * @param {ReputationData} data - The data used to add reputation to the database
+	 * @return {Reputation}           The newly created Reputation row and new response Meassage
 	 * @memberof ReputationManager
 	 */
-	async giveRep(data, channel) {
-		const delta = await Reputation.create(data);
+	async giveRep(data) {
+		return await Reputation.create(data);
+	}
 
 	/**
 	 * Constructs a response string for when reputation is given.
