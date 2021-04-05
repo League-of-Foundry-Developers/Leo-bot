@@ -8,7 +8,10 @@ const { Reputation, Score } = require("./database.js");
 const { Op } = require("sequelize");
 
 const sequelize = new Sequelize("sqlite:./leo.db");
-const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
+const client = new Discord.Client({
+	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+	intents: Discord.Intents.NON_PRIVILEGED
+});
 
 const debug = true;
 
