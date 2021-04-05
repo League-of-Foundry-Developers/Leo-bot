@@ -1,6 +1,9 @@
 const { mainToken, token, testGuild, darkGuild } = require("./config.json");
 const Discord = require("discord.js");
-const client = new Discord.Client();
+const client = new Discord.Client({
+	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+	intents: Discord.Intents.NON_PRIVILEGED
+});
 
 const dev = process.argv[2] == "true";
 
@@ -120,6 +123,14 @@ async function main() {
 				"name": "scoreboard",
 				"description": "Display the reputation scoreboard.",
 				"type": 1,
+				"options": [
+					{
+						"type": 4,
+						"name": "page",
+						"description": "Which page of the scoreboard would you like to access?",
+						"required": false
+					}
+				],
 			}
 		]
 	}});
