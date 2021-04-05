@@ -126,6 +126,7 @@ class ReputationManager {
 
 		if  (reply) await message.reply(response, this.noPing);
 		else await message.channel.send(response, this.noPing);
+		console.log(response);
 
 		return rep;
 	}
@@ -179,8 +180,23 @@ class ReputationManager {
 	}
 
 	async checkCommand(interaction, options) {
-		return;
+		const user = await this.client.users.fetch(options.user);
+
+		const score = await Score.findOne({
+			where: { user: user.id }
+		}) || { score: 0, rank: 0 };
+
+		const message = `<@!${user.id}>: **${score.score}** ${this.config.points.name} (#**${score.rank}**)`;
+
+		const response = await this.bot.respond(interaction, {
+			content: message,
+			allowed_mentions: { "parse": [] }
+		});
+
+		console.log(message);
+		return response;
 	}
+
 	async scoreboardCommand(interaction, options) {
 		return;
 	}
@@ -227,7 +243,7 @@ class ReputationManager {
 		const stats = score ? ` (current: \`#${score.rank}\` - \`${score.score}\`)` : "";
 		const reason = giveReason ? ` Reason: \n> ${giveReason}` : "";
 		
-		return `${intro} ${amount} ${this.config.points.name} to ${recipient}.${stats}${reason}`;
+		return `${intro} **${amount}** ${this.config.points.name} to ${recipient}.${stats}${reason}`;
 	}
 
 	/**
