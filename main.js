@@ -2,7 +2,6 @@ const config = require(process.argv[2]);
 const Discord = require("discord.js");
 const fetch = require("node-fetch");
 const { Sequelize } = require("sequelize");
-const columnify = require("columnify");
 
 const { Reputation, Score } = require("./database.js");
 
