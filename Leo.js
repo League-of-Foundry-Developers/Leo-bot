@@ -54,6 +54,13 @@ class Leo {
 			this.reputation.handleReaction(reaction, user)
 		]);
 	}
+
+	/**
+	 * Delegates /slash command interaction handling.
+	 *
+	 * @param {Interaction} interaction
+	 * @memberof Leo
+	 */
 	async onInteractionCreate(interaction) {
 		await Promise.all([
 			this.reputation.handleInteraction(interaction)

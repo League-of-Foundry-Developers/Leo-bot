@@ -12,6 +12,14 @@ const { Reputation, Score } = require("../database.js");
  * @typedef {import("../database.js").ReputationData} ReputationData
  */
 
+/**
+ * A class to manage the reputation system.
+ *
+ * Hanldes responses to commands and input, giving and taking
+ * points, and displaying stats.
+ *
+ * @class ReputationManager
+ */
 class ReputationManager {
 	/**
 	 * Creates an instance of ReputationManager.
@@ -132,12 +140,12 @@ class ReputationManager {
 	}
 
 	/**
-	 * Handles /slash command interactions.
+	 * Handles /slash command interactions for the `/rep` command.
 	 * Delegates the interaction to the appropriate subcommand,
 	 * a method with the form of subnameCommand(Interaction, subcommandOptions)
 	 *
-	 * @param {*} interaction
-	 * @return {*} 
+	 * @param {Interaction} interaction - Information abour the interaction
+	 * @return {object}                   The response object
 	 * @memberof ReputationManager
 	 */
 	async handleInteraction(interaction) {
@@ -148,6 +156,17 @@ class ReputationManager {
 		if (this[handler]) return await this[handler](interaction, this.extractOptions(sub));
 	}
 
+	/**
+	 * Hanldes the `/rep give` command.
+	 *
+	 * The target user is given the specified number of points, or one.
+	 * Then a message is returned to let the user know that their points were changed.
+	 *
+	 * @param {Interaction}              interaction - Information abour the interaction
+	 * @param {Array<InteractionOption>} options     - Information abour the interaction
+	 * @return {object}                                The response object
+	 * @memberof ReputationManager
+	 */
 	async giveCommand(interaction, options) {
 		const user = await this.client.users.fetch(options.user);
 
@@ -179,6 +198,17 @@ class ReputationManager {
 		return response;
 	}
 
+	/**
+	 * Handles the `/rep check` command.
+	 *
+	 * Retrieves information about how much reputation a user has, and their current
+	 * standings, then sends a response with the relevent information.
+	 *
+	 * @param {Interaction}              interaction - Information abour the interaction
+	 * @param {Array<InteractionOption>} options     - Information abour the interaction
+	 * @return {object}                                The response object
+	 * @memberof ReputationManager
+	 */
 	async checkCommand(interaction, options) {
 		const user = await this.client.users.fetch(options.user);
 
@@ -197,6 +227,17 @@ class ReputationManager {
 		return response;
 	}
 
+	/**
+	 * Handles the `/rep scoreboard` command.
+	 *
+	 * Produces an embed with a scoreboard table, optionally displaying
+	 * further pages. 
+	 *
+	 * @param {Interaction}              interaction - Information abour the interaction
+	 * @param {Array<InteractionOption>} options     - Information abour the interaction
+	 * @return {object}                                The response object
+	 * @memberof ReputationManager
+	 */
 	async scoreboardCommand(interaction, options) {
 		const message = `Reputation Scoreboard:`;
 		const scoreboard = await this.getScoreboardPage((options?.page - 1) * 10 || 0);
@@ -211,6 +252,13 @@ class ReputationManager {
 		return response;
 	}
 
+	/**
+	 * Gets the formatted text embed for a particular scoreboard page.
+	 *
+	 * @param {number} page - The target page of the scoreboard.
+	 * @return {object}       The embed data for the scoreboard embed
+	 * @memberof ReputationManager
+	 */
 	async getScoreboardPage(page) {
 		const scores = await Score.findAll({
 			attributes: ["rank", "score", "user"],
@@ -227,6 +275,14 @@ class ReputationManager {
 		return await this.getScoreboardEmbed(scores);
 	}
 
+	/**
+	 * Formats the data of a scoreboard page into a table,
+	 * and returns an object of Discord embed data.
+	 *
+	 * @param {Array<Score?} scores - A set of scores to produce the table from
+	 * @return {object}               The embed data for the scoreboard embed
+	 * @memberof ReputationManager
+	 */
 	getScoreboardEmbed(scores) {
 		const board = scores.map((s, i) => ({
 			"- Rank -": `#${s.rank}`,
@@ -249,6 +305,13 @@ class ReputationManager {
 		}
 	}
 
+	/**
+	 * Extracts the options from a command into a key:value pair.
+	 *
+	 * @param {InteractionData|InteractionOption} command - The command data or subcommand to extract options from
+	 * @return {Object<string,any>}                         The key:value object of each option and its value 
+	 * @memberof ReputationManager
+	 */
 	extractOptions(command) {
 		if (!command.options) return null;
 		return command.options.reduce((options, option) => {
