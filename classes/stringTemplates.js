@@ -1,29 +1,31 @@
 class Strings {
 
 /**
- * @param {string} version     - The package version
- * @param {string} ccv         - Compatible core version
- * @param {string} [system]    - String list of systems
- * @param {string} [changelog] - Link tot he changelog
+ * @param {object} params
+ * @param {string} params.version               - The package version
+ * @param {string} params.compatibleCoreVersion - Compatible core version
+ * @param {string} [params.systems]             - String list of systems
+ * @param {string} [params.changelog]           - Link tot he changelog
  * @return {string} 
  */
-static  packageInfo(version, ccv, system, changelog) { 
+static packageInfo({ version, compatibleCoreVersion, systems, changelog }) {
 
 return `\
 **Version:** ${version}
 **Core:** ${ccv}
-${system ? `**System:** \`${system}\`` : ""}
+${system ? `**System:** \`${systems}\`` : ""}
 ${changelog ? `[Changelog](${changelog})` : ""}`
 
 }
 
 /**
- * @param {string} installs     - Percentage of Forge installs
- * @param {string} endorsements - Number of Foundry Hub endorsements
- * @param {string} comments     - Number of Foundry Hub comments
+ * @param {object} params
+ * @param {string} params.installs     - Percentage of Forge installs
+ * @param {number} params.endorsements - Number of Foundry Hub endorsements
+ * @param {number} params.comments     - Number of Foundry Hub comments
  * @return {string} 
  */
-static packageStats(installs, endorsements, comments) {
+static packageStats({ installs, endorsements, comments }) {
 
 return `\
 **Installs:** ${installs}%
@@ -33,15 +35,16 @@ return `\
 }
 
 /**
- * @param {string} manifest - The manifest URL for the package .json manifest file.
- * @param {string} url      - The website of the package
- * @param {string} name     - The package `name` field from the manifest
+ * @param {object} params
+ * @param {string} params.manifestUrl - The manifest URL for the package .json manifest file.
+ * @param {string} params.url         - The website of the package
+ * @param {string} params.name        - The package `name` field from the manifest
  * @return {string} 
  */
-static packageLinks(manifest, url, name) {
+static packageLinks({ manifestUrl, url, name }) {
 
 return `\
-**[Manifest](${manifest})**
+**[Manifest](${manifestUrl})**
 [Project Website](${url})
 [Package Listing](https://foundryvtt.com/packages/${name})
 [Foundry Hub](https://www.foundryvtt-hub.com/package/${name})
