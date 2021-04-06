@@ -1,58 +1,44 @@
+const { Package } = require("./Package.js");
 const { strings } = require("./stringTemplates.js");
 
 class PackageSearch {
-	packageEmbed(package, manifest, fhub) {
-		const image = package.media.find(m => m.type == "cover")?.url
-		const thumb = package.media.find(m => m.type == "icon")?.url
-		const author = package.authors.join(", ");
-		const system = manifest.systems?.join(", ");
+	getPackageResponse(name, manifest) {
+		const package = await Package.get(name, manifest);
 
-		const embed = { 
+
+	}
+	packageEmbed(package) {
+		return {
 			color: 0xff6400,
 			title: package.title,
 			author: {
-				name: `Author: ${author}`
+				name: `Author: ${package.author}`
 			},
 			description: package.description,
 			image: {
-				url: image
+				url: package.image
 			},
 			thumbnail: {
-				url: thumb
+				url: package.thumb
 			},
 			fields: [
 				{
 					name: "Info:",
-					value: strings.packageInfo(
-						manifest.version,
-						manifest.compatibleCoreVersion,
-						system,
-						manifest.changelog
-					),
+					value: strings.packageInfo(package),
 					inline: true
 				},
 				{
 					name: "Stats:",
-					value: strings.packageStats(
-						package.installs,
-						fhub.endorsements,
-						fhub.comments
-					),
+					value: strings.packageStats(package),
 					inline: true
 				},
 				{
 					name: "Links:",
-					value: strings.packageLinks(
-						manifest.manifest,
-						package.url,
-						package.name
-					),
+					value: strings.packageLinks(package),
 					inline: true
 				}
 			]
 		}
-
-		return embed;
 	}
 }
 
