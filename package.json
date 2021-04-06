@@ -14,10 +14,13 @@
   "author": "zeel",
   "license": "MIT",
   "dependencies": {
+    "@typhonjs-fvtt/validate-manifest": "github:typhonjs-fvtt/validate-manifest",
     "columnify": "^1.5.4",
     "discord.js": "github:discordjs/discord.js",
     "node-fetch": "^2.6.1",
-    "sequelize": "^6.6.2",
+    "sequelize": "^6.6.2"
+  },
+  "devDependencies": {
     "sequelize-cli": "^6.2.0",
     "sqlite3": "^5.0.2"
   }
