@@ -5,9 +5,9 @@ class Package {
 		const package = new Package(...args);
 		return await package.init();
 	}	
-	static validateManifest(manifest, type) {
+	static validateManifest(manifest, type, errors) {
 		if (!this._validateManifest(manifest, type)) {
-			this.error.push("manifest-validation");
+			errors.push("manifest-validation");
 			throw new Error("The manifest for this package did not pass validation.");
 		}
 	}
@@ -45,7 +45,7 @@ class Package {
 			this.getFoundryHub()
 		]);
 
-		try { this.validateManifest(this.manifest, this.bazaar.type); }
+		try { Package.validateManifest(this.manifest, this.bazaar.type, this.errors); }
 		catch (error) { console.error(error); }
 
 		return this;
