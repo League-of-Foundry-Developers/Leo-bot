@@ -30,7 +30,13 @@ class Package {
 		this.errors = [];
 	}
 
+	getError(name) { return this.errors.includes(name); }
+	
 	get hasError() { return Boolean(this.errors.length); }
+	get manifestInvalid() { return this.getError("manifest-validation"); }
+	get manifestError() { return this.fromManifest ? this.getError("manifest") : this.bazaarError; }
+	get bazaarError() { return this.getError("bazaar"); }
+	get foundryHubError() { return this.getError("fhub"); }
 
 	async init() {
 		if (this.fromManifest) await this.getManifest();
