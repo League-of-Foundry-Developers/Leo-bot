@@ -4,8 +4,13 @@ const { strings } = require("./stringTemplates.js");
 class PackageSearch {
 	getPackageResponse(name, manifest) {
 		const package = await Package.get(name, manifest);
-
-
+		
+		if (package.hasError) return this.handlePackageError(package);
+		
+		return {
+			content: `Package: \`${package.name}\``,
+			embeds: [packageEmbed(package)]
+		}
 	}
 	packageEmbed(package) {
 		return {
