@@ -1,3 +1,18 @@
+/************************ Leo config.json ***************************/
+
+
+/**
+ * A set of properties to configure the behaviour of this bot.
+ * 
+ * @typedef {object} LeoConfig
+ * @property {string} token    - The Discord bot token for this bot to use 
+ */
+
+
+
+/********************** Dicord Interactions *************************/
+
+
 /**
  * An interaction is the base "thing" that is sent when a user invokes
  * a command, and is the same for Slash Commands and other future interaction types.
