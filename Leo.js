@@ -32,6 +32,7 @@ class Leo {
 
 	async init() {
 		await this.reputation.init();
+		await this.packages.init();
 		await this.createListeners();
 		await this.client.login(this.config.token);
 	}

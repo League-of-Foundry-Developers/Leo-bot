@@ -13,9 +13,10 @@ class PackageSearch extends InteractionHandler {
 	/** @readonly @override */
 	get commandName() { return "package"; }
 
-	getPackageResponse(name, manifest) {
-		const package = await Package.get(name, manifest);
-		
+	async init() {
+		this.validator = await import("@typhonjs-fvtt/validate-manifest");
+		this.betterErrors = (await import("@typhonjs-node-utils/better-ajv-errors")).default;
+	}
 		if (package.hasError) return this.handlePackageError(package);
 		
 		return {
