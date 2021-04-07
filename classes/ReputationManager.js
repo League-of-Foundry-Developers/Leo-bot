@@ -130,13 +130,13 @@ class ReputationManager extends InteractionHandler {
 	}
 
 	/**
-	 * Hanldes the `/rep give` command.
+	 * Handles the `/rep give` command.
 	 *
 	 * The target user is given the specified number of points, or one.
 	 * Then a message is returned to let the user know that their points were changed.
 	 *
-	 * @param {Interaction}              interaction - Information abour the interaction
-	 * @param {Array<InteractionOption>} options     - Information abour the interaction
+	 * @param {Interaction}              interaction - Information about the interaction
+	 * @param {Array<InteractionOption>} options     - Information about the interaction
 	 * @return {object}                                The response object
 	 * @memberof ReputationManager
 	 */
