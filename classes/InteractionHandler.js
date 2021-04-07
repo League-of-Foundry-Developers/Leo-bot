@@ -46,8 +46,10 @@ class InteractionHandler {
 	/**
 	 * Handles /slash command interactions for a command.
 	 *
-	 * Delegates the interaction to the appropriate subcommand,
-	 * a method with the form of subnameCommand(Interaction, subcommandOptions)
+	 * Delegates the interaction to the appropriate subcommand if applicable,
+	 * a method with the form of subnameCommand(Interaction, subcommandOptions).
+	 *
+	 * If no subcommands are used, delegates handling to {@see this#command}
 	 *
 	 * @param {Interaction} interaction - Information about the interaction
 	 * @return {Promise<object>}          The response object
@@ -57,6 +59,12 @@ class InteractionHandler {
 		if (interaction.data.name != this.commandName) return;
 
 		const sub = interaction.data.options.find(o => o.type == 1);
+
+		if (!sub) return await this.command(
+			interaction,
+			InteractionHandler.extractOptions(interaction.data)
+		);
+
 		const handler = `${sub.name}Command`;
 		if (this[handler]) return await this[handler](
 			interaction,
