@@ -1,24 +1,12 @@
 const fetch = require("node-fetch");
 class Package {
 	static async get(...args) {
-		const package = new Package(...args);
-		return await package.init();
+		const pkg = new Package(...args);
+		return await pkg.init();
 	}	
-	static validateManifest(manifest, type, errors) {
-		if (!this._validateManifest(manifest, type)) {
-			errors.push("manifest-validation");
-			throw new Error("The manifest for this package did not pass validation.");
-		}
-	}
-	static _validateManifest(manifest, type) {
-		switch (type) {
-			case "system": return validateSystemPlus(manifest);
-			case "module": return validateModulePlus(manifest);
-			case "world": return true; // No validator for this 😬
-		}
-	}
 
-	constructor(name, manifest=null) {
+	constructor(manager, name, manifest=null) {
+		this.manager = manager;
 		this._name = name;
 		if (manifest) {
 			this._manifestUrl = manifest;
@@ -30,7 +18,7 @@ class Package {
 	}
 
 	getError(name) { return this.errors.includes(name); }
-	
+
 	get hasError() { return Boolean(this.errors.length); }
 	get manifestInvalid() { return this.getError("manifest-validation"); }
 	get manifestError() { return this.fromManifest ? this.getError("manifest") : this.bazaarError; }
@@ -42,13 +30,14 @@ class Package {
 	}
 
 	async init() {
+		console.log(this.fromManifest);
 		if (this.fromManifest) await this.getManifest();
 		else await Promise.all([
 			this.getBazaar(),
 			this.getFoundryHub()
 		]);
 
-		try { Package.validateManifest(this.manifest, this.bazaar.type, this.errors); }
+		try { await this.validateManifest(); }
 		catch (error) { console.error(error); }
 
 		return this;
@@ -124,7 +113,27 @@ class Package {
 		}
 	}
 
+	async validateManifest() {
+		const { valid, error } = 
+			this.manager.validateManifest(this.manifest, this.type);
+
+		if (!valid) {
+			this.errors.push("manifest-validation");
+			this.validationError = error;
+			throw new Error(`The manifest for this package did not pass validation:\n${error}`);
+		}
+
+		return { valid, error };
+	}
+
 	get name() { return this._name; }
+
+	get type() {
+		if (!this.fromManifest && this.bazaar?.type) 
+			return this.bazaar.type
+
+		return this.manifestUrl.match(/(module|system|world).json/)[1] || null;
+	}
 
 	get image() {
 		if (this.badData) return "";

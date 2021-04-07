@@ -57,6 +57,19 @@ class PackageSearch extends InteractionHandler {
 			]
 		}
 	}
+
+	validateManifest(manifest, type) {
+		const validator = {
+			"module": this.validator.validateModulePlus,
+			"system": this.validator.validateSystemPlus,
+			"world" : function () { this.errors = []; return true; }
+		}[type];
+
+		const valid = validator(manifest);
+		const error = this.betterErrors.asString(validator.errors);
+
+		return { valid, error };
+	}
 }
 
 module.exports.PackageSearch = PackageSearch;
