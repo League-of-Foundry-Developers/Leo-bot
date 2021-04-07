@@ -20,38 +20,37 @@ class PackageSearch extends InteractionHandler {
 		if (package.hasError) return this.handlePackageError(package);
 		
 		return {
-			content: `Package: \`${package.name}\``,
-			embeds: [packageEmbed(package)]
+			content: `Error loading data for ${pkg.name}:\n${pkg.errors.join(", ")}`
 		}
 	}
-	packageEmbed(package) {
+	packageEmbed(pkg) {
 		return {
 			color: 0xff6400,
-			title: package.title,
+			title: pkg.title,
 			author: {
-				name: `Author: ${package.author}`
+				name: `Author: ${pkg.author}`
 			},
-			description: package.description,
+			description: pkg.description,
 			image: {
-				url: package.image
+				url: pkg.image
 			},
 			thumbnail: {
-				url: package.thumb
+				url: pkg.thumb
 			},
 			fields: [
 				{
 					name: "Info:",
-					value: strings.packageInfo(package),
+					value: strings.packageInfo(pkg),
 					inline: true
 				},
 				{
 					name: "Stats:",
-					value: strings.packageStats(package),
+					value: strings.packageStats(pkg),
 					inline: true
 				},
 				{
 					name: "Links:",
-					value: strings.packageLinks(package),
+					value: strings.packageLinks(pkg),
 					inline: true
 				}
 			]
