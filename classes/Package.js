@@ -1,5 +1,4 @@
-const { validateModulePlus, validateSystemPlus } = require("@typhonjs-fvtt/validate-manifest");
-
+const fetch = require("node-fetch");
 class Package {
 	static async get(...args) {
 		const package = new Package(...args);

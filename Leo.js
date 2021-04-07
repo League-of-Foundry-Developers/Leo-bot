@@ -1,5 +1,4 @@
 const { Client } = require("discord.js");
-const fetch = require("node-fetch");
 const { PackageSearch } = require("./classes/PackageSearch.js");
 const { ReputationManager } = require("./classes/ReputationManager.js");
 
