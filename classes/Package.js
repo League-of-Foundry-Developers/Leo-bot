@@ -37,6 +37,10 @@ class Package {
 	get bazaarError() { return this.getError("bazaar"); }
 	get foundryHubError() { return this.getError("fhub"); }
 
+	get badData() {
+		return this.fromManifest && (this.manifestError || this.manifestInvalid);
+	}
+
 	async init() {
 		if (this.fromManifest) await this.getManifest();
 		else await Promise.all([
@@ -123,14 +127,18 @@ class Package {
 	get name() { return this._name; }
 
 	get image() {
+		if (this.badData) return "";
 		const media = this.fromManifest ? this.manifest.media : this.bazaar.media;
 		return media.find(m => m.type == "cover")?.url;
 	}
 	get thumb() {
+		if (this.badData) return "";
 		const media = this.fromManifest ? this.manifest.media : this.bazaar.media;
 		return media.find(m => m.type == "icon")?.url;
 	}
 	get author() {
+		console.log("Bad data?: ", this.badData, this.errors);
+		if (this.badData) return "";
 		if (this.fromManifest) {
 			if (!this.manifest.authors) return this.manifest.author;
 			return this.manifest.authors.map(author => author.name)?.join(", ");
@@ -138,6 +146,7 @@ class Package {
 		else return this.bazaar.authors?.join(", ");
 	}
 	get systems() {
+		if (this.badData) return "";
 		return this.manifest.systems?.join(", ");
 	}
 	
@@ -146,9 +155,9 @@ class Package {
 	get compatibleCoreVersion() { return this.manifest.compatibleCoreVersion; }
 	get changelog() { return this.manifest.changelog; }
 
-	get installs() { this.foundryHub?.installs; }
-	get endorsements() { this.foundryHub?.endorsements; }
-	get comments() { this.foundryHub?.comments; }
+	get installs() { return this.foundryHub?.installs; }
+	get endorsements() { return this.foundryHub?.endorsements; }
+	get comments() { return this.foundryHub?.comments; }
 
 	get manifestUrl() {
 		return this.fromManifest ? this._manifestUrl : this.manifest.manifest;
