@@ -17,8 +17,56 @@ class PackageSearch extends InteractionHandler {
 		this.validator = await import("@typhonjs-fvtt/validate-manifest");
 		this.betterErrors = (await import("@typhonjs-node-utils/better-ajv-errors")).default;
 	}
-		if (package.hasError) return this.handlePackageError(package);
+
+	/**
+	 * Handles the /package command.
+	 * 
+	 * Finds the specified package by name, or if a manifest is
+	 * given, fetches the manifest.
+	 *
+	 * Then, responds with an embed including details about the
+	 * package.
+	 *
+	 * If the package can not be found, use the Foundry Hub search to 
+	 * get a list of possible matches instead.
+	 *
+	 * Also validates the package manifest, if the manifest is not valid,
+	 * sends an ephemeral respons indication the issues.
+	 *
+	 * @param {Interaction}              interaction - Information about the interaction
+	 * @param {Array<InteractionOption>} options     - Information about the interaction
+	 * @return {object}                                The response object
+	 * @memberof PackageSearch
+	 */
+	async command(interaction, options) {
+		console.log(options);
+		return await this.bot.respond(interaction, await this.getPackageResponse(options.name, options.manifest));
+	}
+	async getPackageResponse(name, manifest) {
+		const pkg = await Package.get(this, name, manifest);
 		
+		if (pkg.hasError) return this.handlePackageError(pkg);
+		
+		return {
+			content: `Package: \`${pkg.name}\``,
+			embeds: [this.packageEmbed(pkg)]
+		}
+	}
+	handlePackageError(pkg) {
+		console.log("Package errors!")
+
+		if (pkg.manifestInvalid) return {
+			content: `Manifest error for ${pkg.name}:\n${pkg.errors.join(", ")}`,
+			embeds: [
+				{
+					color: 0xff6400,
+					title: "Manifest Errors",
+					description: "```" + pkg.validationError + "```"
+				}
+			],
+			ephemeral: true
+		}
+
 		return {
 			content: `Error loading data for ${pkg.name}:\n${pkg.errors.join(", ")}`
 		}
