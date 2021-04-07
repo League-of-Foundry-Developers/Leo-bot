@@ -59,16 +59,20 @@ class Leo {
 		if (message.author.bot) return;
 		this.debug(message);
 		
-		await Promise.all([
-			this.reputation.handleMessage(message)
-		]);
+		try {
+			await Promise.all([
+				this.reputation.handleMessage(message)
+			]);
+		} catch (e) { console.error(e); }
 	}
 	async onMessageReactionAdd(reaction, user) {
 		if (!await this.fetchPartial(reaction)) return;
 
-		await Promise.all([
-			this.reputation.handleReaction(reaction, user)
-		]);
+		try{
+			await Promise.all([
+				this.reputation.handleReaction(reaction, user)
+			]);
+		} catch(e) { console.error(e); }
 	}
 
 	/**
@@ -78,10 +82,12 @@ class Leo {
 	 * @memberof Leo
 	 */
 	async onInteractionCreate(interaction) {
-		await Promise.all([
-			this.reputation.handleInteraction(interaction),
-			this.packages.handleInteraction(interaction)
-		]);
+		try {
+			await Promise.all([
+				this.reputation.handleInteraction(interaction),
+				this.packages.handleInteraction(interaction)
+			]);
+		} catch (e) { console.error(e); }
 	}
 
 	async createListeners() {
