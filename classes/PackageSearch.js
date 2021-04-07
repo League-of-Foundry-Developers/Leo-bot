@@ -1,7 +1,33 @@
 const { Package } = require("./Package.js");
 const { strings } = require("./stringTemplates.js");
 
+/**
+ * @typedef {import("../Leo.js").Leo} Leo
+ */
+
+/**
+ * A class to manage the /package command.
+ *
+ * Handles the command input, the constructs the appropriate response.
+ *
+ * @class PackageSearch
+ */
 class PackageSearch {
+	/**
+	 * Creates an instance of PackageSearch.
+	 *
+	 * @param {Leo} bot
+	 * @memberof PackageSearch
+	 */
+	constructor(bot) {
+		this.bot = bot;
+	}
+
+	get config() { return this.bot.config; }
+	get client() { return this.bot.client; }
+	get sql() { return this.bot.sql; }
+
+
 	getPackageResponse(name, manifest) {
 		const package = await Package.get(name, manifest);
 		

@@ -15,7 +15,7 @@ const { Reputation, Score } = require("../database.js");
 /**
  * A class to manage the reputation system.
  *
- * Hanldes responses to commands and input, giving and taking
+ * Handles responses to commands and input, giving and taking
  * points, and displaying stats.
  *
  * @class ReputationManager
@@ -342,7 +342,7 @@ class ReputationManager {
 	 * @param {Message}    [options.message]    - The message to which the reputation was given
 	 * @param {Score}      [options.score]      - The current reputation stats for the receiver
 	 * @param {string}     [options.giveReason] - A reason why the giver gave the receiver points
-	 * @return {string}                          The message responding to the reputation giving event
+	 * @return {string}                           The message responding to the reputation giving event
 	 * @memberof ReputationManager
 	 */
 	buildRepResponse(reputation, { sender, receiver, channel, message, score, giveReason }={}) {

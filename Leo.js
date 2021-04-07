@@ -1,5 +1,12 @@
+const { Client } = require("discord.js");
 const fetch = require("node-fetch");
+const { PackageSearch } = require("./classes/PackageSearch.js");
 const { ReputationManager } = require("./classes/ReputationManager.js");
+
+/**
+ * @typedef {import("discord.js").Client} Client
+ * @typedef {import("sequelize").Sequelize} Sequelize
+ */
 
 /**
  * The League of Extraordinary Foundry VTT Developers Discord Bot
@@ -7,12 +14,21 @@ const { ReputationManager } = require("./classes/ReputationManager.js");
  * @class Leo
  */
 class Leo {
+	/**
+	 * Creates an instance of Leo.
+	 *
+	 * @param {LeoConfig} config - The configuration file data for this instance of Leo
+	 * @param {Sequelize} sql    - A reference to the sqlite ORM
+	 * @param {Client}    client - A reference to the Discord.js client
+	 * @memberof Leo
+	 */
 	constructor(config, sql, client) {
 		this.config = config;
 		this.sql = sql;
 		this.client = client;
 
 		this.reputation = new ReputationManager(this);
+		this.packages   = new PackageSearch(this);
 	}
 
 	async init() {
@@ -63,7 +79,8 @@ class Leo {
 	 */
 	async onInteractionCreate(interaction) {
 		await Promise.all([
-			this.reputation.handleInteraction(interaction)
+			this.reputation.handleInteraction(interaction),
+			this.packages.handleInteraction(interaction)
 		]);
 	}
 
