@@ -16,8 +16,13 @@ async function main() {
 				"type": 3,
 				"name": "name",
 				"description": "The `name` (not title) of the package.",
-				"default": false,
 				"required": true
+			},
+			{
+				"type": 3,
+				"name": "manifest",
+				"description": "The URL of an unlisted manifest JSON file.",
+				"required": false
 			}
 		],
 		"name": "package",
