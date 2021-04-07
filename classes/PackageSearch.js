@@ -1,9 +1,6 @@
+const { InteractionHandler } = require("./InteractionHandler.js");
 const { Package } = require("./Package.js");
 const { strings } = require("./stringTemplates.js");
-
-/**
- * @typedef {import("../Leo.js").Leo} Leo
- */
 
 /**
  * A class to manage the /package command.
@@ -12,21 +9,9 @@ const { strings } = require("./stringTemplates.js");
  *
  * @class PackageSearch
  */
-class PackageSearch {
-	/**
-	 * Creates an instance of PackageSearch.
-	 *
-	 * @param {Leo} bot
-	 * @memberof PackageSearch
-	 */
-	constructor(bot) {
-		this.bot = bot;
-	}
-
-	get config() { return this.bot.config; }
-	get client() { return this.bot.client; }
-	get sql() { return this.bot.sql; }
-
+class PackageSearch extends InteractionHandler {
+	/** @readonly @override */
+	get commandName() { return "package"; }
 
 	getPackageResponse(name, manifest) {
 		const package = await Package.get(name, manifest);

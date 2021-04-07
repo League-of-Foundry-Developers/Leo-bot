@@ -1,5 +1,6 @@
 const columnify = require('columnify');
 const { Reputation, Score } = require("../database.js");
+const { InteractionHandler } = require('./InteractionHandler.js');
 
 /**
  * @typedef {import("../Leo.js").Leo} Leo 
@@ -20,20 +21,9 @@ const { Reputation, Score } = require("../database.js");
  *
  * @class ReputationManager
  */
-class ReputationManager {
-	/**
-	 * Creates an instance of ReputationManager.
-	 *
-	 * @param {Leo} bot - The instance of Leo to which this manager belongs
-	 * @memberof ReputationManager
-	 */
-	constructor (bot) {
-		this.bot = bot;
-	}
-
-	get config() { return this.bot.config; } 
-	get client() { return this.bot.client; } 
-	get sql()    { return this.bot.sql;    }
+class ReputationManager extends InteractionHandler {
+	/** @readonly @override */
+	get commandName() { return "rep"; }
 
 	/** @type {object} Message options to disable pings @readonly  */
 	get noPing() { return { "allowedMentions": { "parse": [], "repliedUser": false } }; }
@@ -137,23 +127,6 @@ class ReputationManager {
 		console.log(response);
 
 		return rep;
-	}
-
-	/**
-	 * Handles /slash command interactions for the `/rep` command.
-	 * Delegates the interaction to the appropriate subcommand,
-	 * a method with the form of subnameCommand(Interaction, subcommandOptions)
-	 *
-	 * @param {Interaction} interaction - Information abour the interaction
-	 * @return {object}                   The response object
-	 * @memberof ReputationManager
-	 */
-	async handleInteraction(interaction) {
-		if (interaction.data.name != "rep") return;
-
-		const sub = interaction.data.options.find(o => o.type == 1);
-		const handler = `${sub.name}Command`;
-		if (this[handler]) return await this[handler](interaction, this.extractOptions(sub));
 	}
 
 	/**
@@ -303,21 +276,6 @@ class ReputationManager {
 			title: "Scoreboard",
 			description: "```\n" + message + "\n```"
 		}
-	}
-
-	/**
-	 * Extracts the options from a command into a key:value pair.
-	 *
-	 * @param {InteractionData|InteractionOption} command - The command data or subcommand to extract options from
-	 * @return {Object<string,any>}                         The key:value object of each option and its value 
-	 * @memberof ReputationManager
-	 */
-	extractOptions(command) {
-		if (!command.options) return null;
-		return command.options.reduce((options, option) => {
-			options[option.name] = option.value; 
-			return options;
-		}, {});
 	}
 
 	/**
