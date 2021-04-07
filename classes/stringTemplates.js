@@ -12,8 +12,8 @@ static packageInfo({ version, compatibleCoreVersion, systems, changelog }) {
 
 return `\
 **Version:** ${version}
-**Core:** ${ccv}
-${system ? `**System:** \`${systems}\`` : ""}
+**Core:** ${compatibleCoreVersion}
+${systems ? `**System:** \`${systems}\`` : ""}
 ${changelog ? `[Changelog](${changelog})` : ""}`
 
 }
