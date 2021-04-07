@@ -14,7 +14,8 @@
   "author": "zeel",
   "license": "MIT",
   "dependencies": {
-    "@typhonjs-fvtt/validate-manifest": "github:typhonjs-fvtt/validate-manifest",
+    "@typhonjs-fvtt/validate-manifest": "^0.0.0",
+    "@typhonjs-node-utils/better-ajv-errors": "^0.0.8",
     "columnify": "^1.5.4",
     "discord.js": "github:discordjs/discord.js",
     "node-fetch": "^2.6.1",
