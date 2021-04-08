@@ -55,11 +55,11 @@ To create the /slash commands on the guild sepcified.
 
 Finally, depending on which config you want to run, run:
 ```
-npm run bot
+npm run leo
 // Or
-npm run bot-test
+npm run leo-test
 // Or
-npm run bot-dev
+npm run leo-dev
 // Or
 node main.js ./some-other-file.json
 ```

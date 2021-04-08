@@ -4,9 +4,9 @@
   "description": "League of Exaordinary Foundry VTT Developers Discord Bot",
   "main": "main.js",
   "scripts": {
-    "bot": "node main.js ./config.json",
-    "bot-test": "node main.js ./test.config.json",
-    "bot-dev": "node --trace-warnings --unhandled-rejections=strict main.js ./dev.config.json",
+    "leo": "node main.js ./config.json",
+    "leo-test": "node main.js ./test.config.json",
+    "leo-dev": "node --trace-warnings --unhandled-rejections=strict main.js ./dev.config.json",
 
     "create-cmd": "node createCommands.js ./config.json",
     "create-cmd-dev": "node createCommands.js ./dev.config.json",
