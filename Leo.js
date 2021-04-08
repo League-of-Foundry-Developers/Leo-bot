@@ -106,3 +106,25 @@ class Leo {
 }
 
 module.exports.Leo = Leo;
+
+/* Leftovers from earlier development not yet re-factored
+async function handleSayCommand(interaction) {
+	console.log(client.channels);
+	const channel = interaction.data.options.find(o => o.name == "channel")?.value;
+	const message = interaction.data.options.find(o => o.name == "message")?.value;
+
+	console.log(`
+		Sending message on channel: ${channel}
+		> ${message}
+	`);
+
+	await client.api.interactions(interaction.id, interaction.token).callback.post({data: {
+		type: 4,
+		data: {
+			content: `Sending message to ${channel}`
+		}
+	}});
+
+	const ch = await client.channels.fetch(channel);
+	ch.send(message);
+}*/

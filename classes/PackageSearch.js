@@ -127,3 +127,24 @@ class PackageSearch extends InteractionHandler {
 }
 
 module.exports.PackageSearch = PackageSearch;
+
+/* Leftovers from earlier development not yet re-factored
+async function getPackageSearchEmbed(query) {
+	const search = await searchPackage(query);
+	const options = search.map(n => "`" + n + "`").join("\n");
+
+	return {
+		color: 0xff6400,
+		title: "Similar Packages",
+		description: options
+	}
+
+}
+
+async function searchPackage(query) {
+	const response = await fetch(`https://www.foundryvtt-hub.com/wp-json/relevanssi/v1/search?posts_per_page=5&paged=1&type=package&keyword=${query}`);
+	let data = await response.json();
+	if (!data || data?.code == "No results") data = [];
+
+	return data.map(p => p.slug);
+}*/
