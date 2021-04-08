@@ -3,6 +3,10 @@ Leo is configured with a `config.json` file, or with a `test.config.json` or `de
 
 This allows you to configure seperate settings for an in-developement environment from your testing environment, from your live environment.
 
+- `config.json`: For your live Discord server
+- `test.config.json`: For a private testing Discord server
+- `dev.config.json`: For a personal development Discord server
+
 ## Example config.json file
 **Do not allow your token to become public, do not commit you config.json file to Git, or share it anywhere**
 ```json
@@ -31,22 +35,31 @@ This allows you to configure seperate settings for an in-developement environmen
 # Running This Bot
 First, you must run:
 ```
-npm run db-init ./path/to/config.json
+npm run db-init
+// Or
+npm run db-init-test
+// Or
+npm run db-init-dev  
 ```
 To create your database
 
 Then run:
 ```
 npm run create-cmd
-npm run create-cmd-test // Or
-npm run create-cmd-dev  // Or
+// Or
+npm run create-cmd-test
+// Or
+npm run create-cmd-dev  
 ```
 To create the /slash commands on the guild sepcified.
 
 Finally, depending on which config you want to run, run:
 ```
 npm run bot
+// Or
 npm run bot-test
+// Or
 npm run bot-dev
+// Or
 node main.js ./some-other-file.json
 ```
