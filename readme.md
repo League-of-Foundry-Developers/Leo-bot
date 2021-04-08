@@ -33,7 +33,7 @@ This allows you to configure seperate settings for an in-developement environmen
 }
 ```
 # Running This Bot
-First, you must run:
+After running `npm install` to install dependencies, you must run:
 ```
 npm run db-init
 // Or
