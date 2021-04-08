@@ -1,9 +1,21 @@
-//import DB from "sequelize";
+/**
+ * Call this file like:
+ * `node dbLoader.js ./config.json ./yag-export.json`
+ * Where the first argument is the config file for your Leo,
+ * and the second is data exported from YAGPDB.xyz
+ */
+
+/** @type {LeoConfig} */
+const config = require(process.argv[2]);
 const { Reputation } = require("./database.js");
 const { Sequelize } = require("sequelize");
-const sequelize = new Sequelize("sqlite:./leo.db");
 
-const data = require("./yag-export.json");
+const sequelize = new Sequelize({
+	dialect: "sqlite",
+	storage: config.database
+});
+
+const data = require(process.argv[3]);
 
 async function main() {
 	Reputation.init(sequelize);
