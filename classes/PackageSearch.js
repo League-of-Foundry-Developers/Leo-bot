@@ -55,22 +55,29 @@ class PackageSearch extends InteractionHandler {
 	handlePackageError(pkg) {
 		console.log("Package errors!")
 
-		if (pkg.manifestInvalid) return {
-			content: `Manifest error for ${pkg.name}:\n${pkg.errors.join(", ")}`,
-			embeds: [
-				{
-					color: 0xff6400,
-					title: "Manifest Errors",
-					description: "```" + pkg.validationError + "```"
-				}
-			],
-			ephemeral: true
-		}
+		if (pkg.manifestInvalid) return this.getValidationError(pkg);
+		if (pkg.notFound) return this.getAlternates(pkg);
 
 		return {
-			content: `Error loading data for ${pkg.name}:\n${pkg.errors.join(", ")}`
+			content: `Error loading data for \`${pkg.name}\`.\nErrors: \`${pkg.errors.join(", ")}\``,
+			flags: 64
 		}
 	}
+
+	getValidationError(pkg) {
+		return {
+			content: `Error loading data for \`${pkg.name}\`.\nErrors: \`${pkg.errors.join(", ")}\`\n\`\`\`${pkg.validationError}\`\`\``,
+			flags: 64
+		}
+	}
+
+	getAlternates(pkg) {
+		return {
+			content: `Error loading data for \`${pkg.name}\`.\nErrors: \`${pkg.errors.join(", ")}\``,
+			flags: 64
+		}
+	}
+
 	packageEmbed(pkg) {
 		return {
 			color: 0xff6400,

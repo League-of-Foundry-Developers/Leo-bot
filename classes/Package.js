@@ -19,6 +19,8 @@ class Package {
 
 	getError(name) { return this.errors.includes(name); }
 
+	get notFound() { return this.bazaarError && !this.fromManifest; }
+
 	get hasError() { return Boolean(this.errors.length); }
 	get manifestInvalid() { return this.getError("manifest-validation"); }
 	get manifestError() { return this.fromManifest ? this.getError("manifest") : this.bazaarError; }
