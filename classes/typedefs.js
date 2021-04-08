@@ -4,8 +4,21 @@
 /**
  * A set of properties to configure the behaviour of this bot.
  * 
- * @typedef {object} LeoConfig
- * @property {string} token    - The Discord bot token for this bot to use 
+ * @typedef  {object}  LeoConfig
+ * @property {string}  token                     - The Discord bot token for this bot to use
+ * @property {string}  guild                     - The guild id of the Discord server
+ * @property {object}  emotes                    - A group of settings regarding emotes
+ * @property {object}  emotes.plusone            - A group of settigns regarding the +1 emote
+ * @property {string}  emotes.plusone.id         - The Discord snowflake id of the +1 emote
+ * @property {string}  emotes.plusone.name       - The :name: of the +1 emote
+ * @property {object}  points                    - A group of settings regarding points
+ * @property {string}  points.name               - The display name of points
+ * @property {object}  permissions               - A group of settings regarding permissions
+ * @property {string}  permissions.giveNegative  - The Discord snowflake ID of a role which may give negative points (take)
+ * @property {string}  permissions.giveMany      - The id of a role that can give more than one point
+ * @property {number}  permissions.giveManyLimit - The give limit of the previous group
+ * @property {string}  permissions.giveUnlimited - The id of a role which has no give restrictions
+ * @property {boolean} debug                     - Whether or not debugging mode is enabled
  */
 
 
