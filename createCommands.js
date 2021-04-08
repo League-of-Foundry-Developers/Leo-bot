@@ -1,16 +1,15 @@
-const { mainToken, token, testGuild, darkGuild } = require("./config.json");
+/** @type {LeoConfig} */
+const config = require(process.argv[2]);
 const Discord = require("discord.js");
 const client = new Discord.Client({
 	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 	intents: Discord.Intents.NON_PRIVILEGED
 });
 
-const dev = process.argv[2] == "true";
-
 async function main() {
-	await client.login(dev ? token : mainToken);
+	await client.login(config.token);
 
-	await client.api.applications(client.user.id).guilds(dev ? testGuild : darkGuild).commands.post({data: {
+	await client.api.applications(client.user.id).guilds(config.guild).commands.post({data: {
 		"options": [
 			{
 				"type": 3,
@@ -30,7 +29,7 @@ async function main() {
 	}});
 	console.log("Created /package");
 
-	await client.api.applications(client.user.id).guilds(dev ? testGuild : darkGuild).commands.post({data: {
+	await client.api.applications(client.user.id).guilds(config.guild).commands.post({data: {
 		"options": [
 			{
 				"type": 7,
@@ -52,7 +51,7 @@ async function main() {
 	}});
 	console.log("Created /say");
 
-	await client.api.applications(client.user.id).guilds(dev ? testGuild : darkGuild).commands.post({data: {
+	await client.api.applications(client.user.id).guilds(config.guild).commands.post({data: {
 		"options": [
 			{
 				"type": 6,
@@ -81,7 +80,7 @@ async function main() {
 	}});
 	console.log("Created /giverep");
 
-	await client.api.applications(client.user.id).guilds(dev ? testGuild : darkGuild).commands.post({data: {
+	await client.api.applications(client.user.id).guilds(config.guild).commands.post({data: {
 		"name": "rep",
 		"description": "Manage user reputation.",
 		"options": [

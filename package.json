@@ -6,7 +6,7 @@
   "scripts": {
     "bot": "node main.js ./config.json",
     "bot-test": "node main.js ./test.config.json",
-    "bot-dev": "node --trace-warnings --unhandled-rejections=strict main.js ./dev.config.json",
+    "bot-dev": "node --trace-warnings --unhandled-rejections=strict main.js ./dev.config.json"
   },
   "author": "zeel",
   "license": "MIT",
