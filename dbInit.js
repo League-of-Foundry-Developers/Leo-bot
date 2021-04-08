@@ -1,9 +1,11 @@
+/** @type {LeoConfig} */
+const config = require(process.argv[2]);
 const { Reputation, Score } = require("./database.js");
 const { Sequelize } = require("sequelize");
 
 const sequelize = new Sequelize({
 	dialect: "sqlite",
-	storage: process.argv[2]
+	storage: config.database
 });
 
 async function main() {

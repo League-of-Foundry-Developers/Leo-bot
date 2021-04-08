@@ -11,7 +11,7 @@
     "create-cmd-dev": "node createCommands.js ./dev.config.json",
     "create-cmd-test": "node createCommands.js ./test.config.json",
 
-    "db-init": "node dbInit.js ./Leo.db"
+    "db-init": "node dbInit.js"
   },
   "author": "zeel",
   "license": "MIT",

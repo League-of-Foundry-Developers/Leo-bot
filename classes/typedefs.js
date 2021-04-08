@@ -7,6 +7,7 @@
  * @typedef  {object}  LeoConfig
  * @property {string}  token                     - The Discord bot token for this bot to use
  * @property {string}  guild                     - The guild id of the Discord server
+ * @property {string}  database                  - The path to an sqlite .db file
  * @property {object}  emotes                    - A group of settings regarding emotes
  * @property {object}  emotes.plusone            - A group of settigns regarding the +1 emote
  * @property {string}  emotes.plusone.id         - The Discord snowflake id of the +1 emote
