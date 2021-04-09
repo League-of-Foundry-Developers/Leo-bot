@@ -22,7 +22,7 @@ class View extends EnhancedModel {
 
 	static async sync({ alter=false }) {
 		const name = this.initOptions.tableName || this.initOptions.modelName;
-		const preamble = `
+		const preamble = /* sql */`
 			CREATE VIEW IF NOT EXISTS 
 				${name}
 			AS`;
@@ -34,13 +34,13 @@ class View extends EnhancedModel {
 
 class Score extends View {
 	static get createCode() {
-		return `
+		return /* sql */`
 		SELECT 
 			user,
 			score,
 			latest,
 			initial,
-			row_number() OVER (
+			dense_rank() OVER (
 				ORDER BY 
 					score DESC,
 					latest DESC
