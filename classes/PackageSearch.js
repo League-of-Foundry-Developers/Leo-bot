@@ -2,6 +2,9 @@ const { InteractionHandler } = require("./InteractionHandler.js");
 const { Package } = require("./Package.js");
 const { strings } = require("./stringTemplates.js");
 
+/**
+ * @typedef {import("discord.js").MessageEmbed} MessageEmbed
+ */
 
 /**
  * A class to manage the /package command.
@@ -11,10 +14,16 @@ const { strings } = require("./stringTemplates.js");
  * @class PackageSearch
  */
 class PackageSearch extends InteractionHandler {
-	/** @readonly @override */
+	/** @readonly @override /package name:name manifest?:url */
 	get commandName() { return "package"; }
 
+	/**
+	 * Initialize required members and structures for ReputationManager
+	 *
+	 * @memberof ReputationManager
+	 */
 	async init() {
+		/** @type {Object<string, function>} A set of manifest validation functions */
 		this.validator = await import("@typhonjs-fvtt/validate-manifest");
 		this.betterErrors = (await import("@typhonjs-node-utils/better-ajv-errors")).default;
 	}
@@ -36,13 +45,23 @@ class PackageSearch extends InteractionHandler {
 	 *
 	 * @param {Interaction}              interaction - Information about the interaction
 	 * @param {Array<InteractionOption>} options     - Information about the interaction
-	 * @return {object}                                The response object
+	 * @return {InteractionResposne}                   The response object
 	 * @memberof PackageSearch
 	 */
 	async command(interaction, options) {
 		console.log(options);
 		return await this.bot.respond(interaction, await this.getPackageResponse(options.name, options.manifest));
 	}
+
+	/**
+	 * Get the data for the package, then respond with a formatted embed,
+	 * or an error message if an error occurs.
+	 *
+	 * @param {string} name        - The `name` of the package
+	 * @param {string} [manifest]  - The URL of the package manifest
+	 * @return {InteractionResposne} The data for the resposne
+	 * @memberof PackageSearch
+	 */
 	async getPackageResponse(name, manifest) {
 		const pkg = await Package.get(this, name, manifest);
 		
@@ -53,6 +72,17 @@ class PackageSearch extends InteractionHandler {
 			embeds: [this.packageEmbed(pkg)]
 		}
 	}
+
+	/**
+	 * Construct the response in the event of an error.
+	 *
+	 * Error responses will be "emphemeral", only the user
+	 * that used the command will see them.
+	 *
+	 * @param {Package} pkg - The package data
+	 * @return {InteractionResposne}
+	 * @memberof PackageSearch
+	 */
 	handlePackageError(pkg) {
 		console.log("Package errors!")
 
@@ -65,6 +95,13 @@ class PackageSearch extends InteractionHandler {
 		return { content: error, flags: InteractionHandler.ephemeral }
 	}
 
+	/**
+	 * Build the package data embed.
+	 *
+	 * @param {Pacakge} pkg - The package data
+	 * @return {MessageEmbed}
+	 * @memberof PackageSearch
+	 */
 	packageEmbed(pkg) {
 		// Package info
 		const fields = [{
@@ -76,12 +113,8 @@ class PackageSearch extends InteractionHandler {
 		if (!pkg.fromManifest) fields.push({
 			name: "Stats:", inline: true,
 			value: strings.packageStats(pkg),	
-					value: strings.packageStats(pkg),
-			value: strings.packageStats(pkg),	
 		}, {
 			name: "Links:", inline: true,
-			value: strings.packageLinks(pkg),	
-					value: strings.packageLinks(pkg),
 			value: strings.packageLinks(pkg),	
 		});
 		
@@ -96,6 +129,19 @@ class PackageSearch extends InteractionHandler {
 		}
 	}
 
+	/**
+	 * Runs the manifest through the validation function of
+	 * the appropriate type. No validator for worlds.
+	 *
+	 * @param {object} manifest
+	 * @param {string} type
+	 * @return {{
+	 *     valid: boolean,
+	 *	   error: string
+	 * }} Valid: whether or not the manifest is valid.
+	 *    Error: A string containing an error message if not valid.
+	 * @memberof PackageSearch
+	 */
 	validateManifest(manifest, type) {
 		const validator = {
 			"module": this.validator.validateModulePlus,
