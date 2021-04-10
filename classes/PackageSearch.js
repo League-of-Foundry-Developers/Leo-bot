@@ -104,18 +104,19 @@ class PackageSearch extends InteractionHandler {
 	 */
 	packageEmbed(pkg) {
 		// Package info
-		const fields = [{
-			name: "Info:", inline: true,
-			value: strings.packageInfo(pkg),
-		}];
+		const fields = [
+			this.field("Info:", strings.packageInfo(pkg)),
 
-		// Stats and links only if not a fromManifest package
-		if (!pkg.fromManifest) fields.push(
-			this.field("Stats:", strings.packageStats(pkg)),
-			this.field("Links:", strings.packageLinks(pkg)),
-		);
-		// Manifest link if it is fromManifest
-		else fields.push(this.field("Links:", `**[Manifest](${pkg.manifestUrl})**`));
+			// If the package info is just from the manifest
+			...pkg.fromManifest ? 
+
+			// Only include the manifest link
+			[this.field("Links:", `**[Manifest](${pkg.manifestUrl})**`)] :
+			
+			// Otherwise include stats and all links
+			[this.field("Stats:", strings.packageStats(pkg)),
+			 this.field("Links:", strings.packageLinks(pkg)) ]
+		];
 		
 		return {
 			color:       0xff6400,                        // Foundry orange
