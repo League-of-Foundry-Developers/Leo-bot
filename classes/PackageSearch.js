@@ -50,7 +50,13 @@ class PackageSearch extends InteractionHandler {
 	 */
 	async command(interaction, options) {
 		console.log(options);
-		return await this.bot.respond(interaction, await this.getPackageResponse(options.name, options.manifest));
+		return await this.bot.respond(
+			interaction, 
+			await this.getPackageResponse(
+				options.name,
+				options.manifest
+			)
+		);
 	}
 
 	/**
