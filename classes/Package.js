@@ -63,6 +63,8 @@ class Package {
 	get manifestError() { return this.fromManifest ? this.getError("manifest") : this.bazaarError; }
 	/** @type {boolean} Was there an error communicating with the Bazaar API */
 	get bazaarError() { return this.getError("bazaar"); }
+	/** @type {boolean} Was there an error searching for alternatives */
+	get searchError() { return this.getError("search"); }
 	/** @type {boolean} Was there an error communication with the Foundry Hub API*/
 	get foundryHubError() { return this.getError("fhub"); }
 
@@ -87,8 +89,11 @@ class Package {
 			this.getFoundryHub()
 		]);
 
-		try { await this.validateManifest(); }
-		catch (error) { console.error(error); }
+		if (this.notFound) await this.searchPackages();
+		else {
+			try { await this.validateManifest(); }
+			catch (error) { console.error(error); }
+		}
 
 		return this;
 	}
@@ -101,6 +106,7 @@ class Package {
 	 * In the event of an error, logs the error in @see Package.errors
 	 *
 	 * @async
+	 * @return {Promise<void>}
 	 * @memberof Package
 	 */
 	async getBazaar() {
@@ -134,6 +140,7 @@ class Package {
 	 * In the event of an error, logs the error in @see Package.errors
 	 *
 	 * @async
+	 * @return {Promise<void>}
 	 * @memberof Package
 	 */
 	async getFoundryHub() {
@@ -165,6 +172,7 @@ class Package {
 	 * In the event of an error, logs the error in @see Package.errors
 	 *
 	 * @async
+	 * @return {Promise<void>}
 	 * @memberof Package
 	 */
 	async getManifest() {
@@ -194,14 +202,46 @@ class Package {
 	}
 
 	/**
+	 * Fetches a list of similar package names if the package couldn't be found.
+	 * Error checks the process, and stores the data.
+	 *
+	 * In the event of an error, logs the error in @see Package.errors
+	 *
+	 * @async
+	 * @return {Promise<void>}
+	 * @memberof Package
+	 */
+	async searchPackages() {
+		try {
+			const response = await fetch(`https://www.foundryvtt-hub.com/wp-json/relevanssi/v1/search?posts_per_page=5&paged=1&type=package&keyword=${this.name}`);
+
+			if (response.status != 200) // Not a suceess
+				throw new Error(`Could not fetch search results for \`${this.name}\``);
+
+			let results = await response.json();
+
+			if (!results || results?.code == "No results") // Insufficient data
+				throw new Error(`No results found for query: "${this.name}"`)
+
+			this.searchResults = results.map(p => p.slug);
+		}
+		catch (error) {
+			console.error(`There was an issue fetching search results for "${this.name}"`);
+			console.error(error);
+			this.errors.push("search");
+			this.searchResults = [];
+		}
+	}
+
+	/**
 	 * Checks that the manifest is a valid Foundry package
 	 * manifest, and collects error information if it is not.
 	 *
 	 * @async
-	 * @return {{ 
+	 * @return {Promise<{ 
 	 *     valid: boolean,
 	 *	   error: string 
-	 * }} Valid: whether or not the manifest is valid.
+	 * }>} Valid: whether or not the manifest is valid.
 	 *    Error: A string containing an error message if not valid.
 	 * @memberof Package
 	 */
@@ -211,6 +251,7 @@ class Package {
 
 		if (!valid) {
 			this.errors.push("manifest-validation");
+			/** @type {string} A string containing all the errors found while validating this manifest */
 			this.validationError = error;
 			throw new Error(`The manifest for this package did not pass validation:\n${error}`);
 		}
