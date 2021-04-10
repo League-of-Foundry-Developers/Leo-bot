@@ -110,13 +110,12 @@ class PackageSearch extends InteractionHandler {
 		}];
 
 		// Stats and links only if not a fromManifest package
-		if (!pkg.fromManifest) fields.push({
-			name: "Stats:", inline: true,
-			value: strings.packageStats(pkg),	
-		}, {
-			name: "Links:", inline: true,
-			value: strings.packageLinks(pkg),	
-		});
+		if (!pkg.fromManifest) fields.push(
+			this.field("Stats:", strings.packageStats(pkg)),
+			this.field("Links:", strings.packageLinks(pkg)),
+		);
+		// Manifest link if it is fromManifest
+		else fields.push(this.field("Links:", `**[Manifest](${pkg.manifestUrl})**`));
 		
 		return {
 			color:       0xff6400,                        // Foundry orange
@@ -128,6 +127,17 @@ class PackageSearch extends InteractionHandler {
 			fields:      fields                           // All the sections of data
 		}
 	}
+
+	/**
+	 * Formats the input data into an object
+	 * used as an embed "field.""
+	 *
+	 * @param {string} name
+	 * @param {string} value
+	 * @return {object} 
+	 * @memberof PackageSearch
+	 */
+	field(name, value) { return { name, inline: true, value } }
 
 	/**
 	 * Runs the manifest through the validation function of
