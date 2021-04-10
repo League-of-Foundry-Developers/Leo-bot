@@ -66,36 +66,33 @@ class PackageSearch extends InteractionHandler {
 	}
 
 	packageEmbed(pkg) {
-		return {
-			color: 0xff6400,
-			title: pkg.title,
-			author: {
-				name: `Author: ${pkg.author}`
-			},
-			description: pkg.description,
-			image: {
-				url: pkg.image
-			},
-			thumbnail: {
-				url: pkg.thumb
-			},
-			fields: [
-				{
-					name: "Info:",
-					value: strings.packageInfo(pkg),
-					inline: true
-				},
-				{
-					name: "Stats:",
+		// Package info
+		const fields = [{
+			name: "Info:", inline: true,
+			value: strings.packageInfo(pkg),
+		}];
+
+		// Stats and links only if not a fromManifest package
+		if (!pkg.fromManifest) fields.push({
+			name: "Stats:", inline: true,
+			value: strings.packageStats(pkg),	
 					value: strings.packageStats(pkg),
-					inline: true
-				},
-				{
-					name: "Links:",
+			value: strings.packageStats(pkg),	
+		}, {
+			name: "Links:", inline: true,
+			value: strings.packageLinks(pkg),	
 					value: strings.packageLinks(pkg),
-					inline: true
-				}
-			]
+			value: strings.packageLinks(pkg),	
+		});
+		
+		return {
+			color:       0xff6400,                        // Foundry orange
+			title:       pkg.title,                       // Display name of the package
+			author:    { name: `Author: ${pkg.author}` }, // Might be a comma seperated list
+			description: pkg.description,                 // The description from the manifest
+			image:     { url: pkg.image                }, // The cover image
+			thumbnail: { url: pkg.thumb                }, // The icon image
+			fields:      fields                           // All the sections of data
 		}
 	}
 
