@@ -246,6 +246,9 @@ class Package {
 	 * @memberof Package
 	 */
 	validateManifest() {
+		// TEMPORARILY DISABLED
+		return { valid: true, error: "Validation disabled." };
+
 		const { valid, error } = 
 			this.manager.validateManifest(this.manifest, this.type);
 
@@ -270,22 +273,28 @@ class Package {
 		return this.manifestUrl.match(/(module|system|world).json/)[1] || null;
 	}
 
+	/** @type {string} The nice display "Title" of the package */
+	get title() { return this.manifest.title; }
+
 	/** @type {string|null} The URL of the cover image for the package if it exists */
 	get image() {
 		if (this.badData) return "";
 		const media = this.fromManifest ? this.manifest.media : this.bazaar.media;
+
+		if (!media?.find) return "";
 		return media.find(m => m.type == "cover")?.url;
 	}
 	/** @type {string|null} The URL of the icon for the package if it exists */
 	get thumb() {
 		if (this.badData) return "";
 		const media = this.fromManifest ? this.manifest.media : this.bazaar.media;
+
+		if (!media?.find) return "";
 		return media.find(m => m.type == "icon")?.url;
 	}
 	/** @type {string} A string of one or more authors, multiple are joined by a comma */
 	get author() {
-		console.log("Bad data?: ", this.badData, this.errors);
-		if (this.badData) return "";
+		if (this.badData || !this.manifest.authors?.map) return "";
 		if (this.fromManifest) {
 			if (!this.manifest.authors) return this.manifest.author;
 			return this.manifest.authors.map(author => author.name)?.join(", ");
@@ -294,7 +303,7 @@ class Package {
 	}
 	/** @type {string} A string of one or more systems, multiple are joined by a comma */
 	get systems() {
-		if (this.badData) return "";
+		if (this.badData || !this.manifest.systems?.join) return "";
 		return this.manifest.systems?.join(", ");
 	}
 	
