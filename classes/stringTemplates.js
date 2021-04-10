@@ -53,5 +53,43 @@ return `\
 
 }
 
+
+/**
+ * @static
+ * @param {object}        params
+ * @param {string}        params.name             - The name of the package
+ * @param {Array<string>} params.errors           - A set of error strings
+ * @return {string} 
+ * @memberof Strings
+ */
+static packageError({ name, errors=[] }) {
+
+return `\
+Error loading data for \`${name}\`.
+Errors: \`${errors.join(", ")}\`
+`
+
+}
+
+/**
+ * @static
+ * @param {object}        params
+ * @param {string}        params.name             - The name of the package
+ * @param {Array<string>} params.errors           - A set of error strings
+ * @param {string}        params.validationError  - All the validation errors
+ * @return {string} 
+ * @memberof Strings
+ */
+static validationError({ name, errors, validationError }) {
+
+return `
+${this.packageError({ name, errors })}
+\`\`\`
+${validationError}
+\`\`\`
+`
+
+}
+
 }
 module.exports.strings = Strings;
