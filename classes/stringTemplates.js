@@ -8,7 +8,7 @@ class Strings {
  * @param {string} [params.changelog]           - Link tot he changelog
  * @return {string} 
  */
-static packageInfo({ version, compatibleCoreVersion, systems, changelog }) {
+static packageInfo({ version="0.0.0", compatibleCoreVersion="0.0.0", systems, changelog }) {
 
 return `\
 **Version:** ${version}
@@ -25,7 +25,7 @@ ${changelog ? `[Changelog](${changelog})` : ""}`
  * @param {number} params.comments     - Number of Foundry Hub comments
  * @return {string} 
  */
-static packageStats({ installs, endorsements, comments }) {
+static packageStats({ installs="0", endorsements="0", comments="0" }) {
 
 return `\
 **Installs:** ${installs}%
@@ -53,6 +53,29 @@ return `\
 
 }
 
+/**
+ * @static
+ * @param {object}        params
+ * @param {string}        name   - The thing that was searched for, should be a package `name`
+ * @param {Array<string>} searchResults - A list of possible matches
+ * @return {string} 
+ * @memberof Strings
+ */
+static searchResults({ name, searchResults=[] }) {
+
+const items = searchResults.join("\n");
+return `\
+Could not find the pacakge \`${name}\`.${items ? `
+**Similar names:**
+\`\`\`
+${items}
+\`\`\`` : `
+No similar packages were found.`}
+Check the \`name\` of your package, and that it has been listed. \
+For unlisted packages, try this command again and include the optional \
+manifest URL.`
+
+}
 
 /**
  * @static
