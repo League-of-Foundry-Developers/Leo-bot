@@ -20,6 +20,9 @@ class InteractionHandler {
 		}, {});
 	}
 
+	/** @readonly @type {number} "Ephemeral" response flag, only the command issuer can see the response */
+	static get ephemeral() { return 64; }
+
 	/**
 	 * Creates an instance of InteractionHandler.
 	 *
