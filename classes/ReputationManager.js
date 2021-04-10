@@ -86,7 +86,7 @@ class ReputationManager extends InteractionHandler {
 	 * @return {boolean}          True if the message contains one of the triggers
 	 * @memberof ReputationManager
 	 */
-	async _testMessage(message) {
+	_testMessage(message) {
 		return [
 			m => /(?<![A-z])thanks?(?![A-z])/gi.test(m.content),               // Contains "thank"
 			m => /(?<![A-z])tyvm(?![A-z])/gi.test(m.content),                  // Constains "tyvm"
