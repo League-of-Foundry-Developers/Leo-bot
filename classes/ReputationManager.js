@@ -72,11 +72,13 @@ class ReputationManager extends InteractionHandler {
 	async handleMessage(message) {
 		if (!this._testMessage(message)) return;
 
-		let first = true; // For the first user, Leo should reply to the message.
-		for (let user of message.mentions.users) {
-			await this._giveMessageRep(user[1], message, first);
-			first = false;
-		}
+		const responses = await Promise.all(
+			message.mentions.users.map(user =>
+				this._giveMessageRep(user, message)
+			)
+		);
+
+		return await message.reply(responses.join("\n"), this.noPing);
 	}
 
 	/**
@@ -96,12 +98,12 @@ class ReputationManager extends InteractionHandler {
 	}
 
 	/**
-	 * Handles giving reputation to a user mentioned in a message
+	 * Handles giving reputation to a user mentioned in a message.
 	 *
 	 * @param {User}    user    - The user receiving the reputation
 	 * @param {Message} message - The message in which the user is being "thanked" or otherwise awarded rep
 	 * @param {boolean} reply   - If true, send the message as a reply to the triggering message
-	 * @return {Reputation}       The new database entry Model
+	 * @return {string}           The response message
 	 * @memberof ReputationManager
 	 */
 	async _giveMessageRep(user, message, reply=false) {
@@ -122,11 +124,7 @@ class ReputationManager extends InteractionHandler {
 			score: score
 		})
 
-		if  (reply) await message.reply(response, this.noPing);
-		else await message.channel.send(response, this.noPing);
-		console.log(response);
-
-		return rep;
+		return response;
 	}
 
 	/**
