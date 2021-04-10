@@ -6,7 +6,7 @@
   "scripts": {
     "leo": "node main.js ./config.json",
     "leo-test": "node main.js ./test.config.json",
-    "leo-dev": "node --trace-warnings --unhandled-rejections=strict main.js ./dev.config.json",
+    "leo-dev": "node --inspect --trace-warnings --unhandled-rejections=strict main.js ./dev.config.json",
     "create-cmd": "node createCommands.js ./config.json",
     "create-cmd-dev": "node createCommands.js ./dev.config.json",
     "create-cmd-test": "node createCommands.js ./test.config.json",
