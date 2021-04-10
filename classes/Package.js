@@ -91,7 +91,7 @@ class Package {
 
 		if (this.notFound) await this.searchPackages();
 		else {
-			try { await this.validateManifest(); }
+			try { this.validateManifest(); }
 			catch (error) { console.error(error); }
 		}
 
@@ -238,14 +238,14 @@ class Package {
 	 * manifest, and collects error information if it is not.
 	 *
 	 * @async
-	 * @return {Promise<{ 
+	 * @return {{ 
 	 *     valid: boolean,
 	 *	   error: string 
-	 * }>} Valid: whether or not the manifest is valid.
+	 * }} Valid: whether or not the manifest is valid.
 	 *    Error: A string containing an error message if not valid.
 	 * @memberof Package
 	 */
-	async validateManifest() {
+	validateManifest() {
 		const { valid, error } = 
 			this.manager.validateManifest(this.manifest, this.type);
 
