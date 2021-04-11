@@ -122,15 +122,8 @@ class ReputationManager extends InteractionHandler {
 			messageId: message.id
 		});
 
-		const score = await this.getScore(rep.user);
+		return score = await this.getScore(rep.user);
 
-		//const response = this.buildRepResponse(rep, {
-		//	sender: message.author,
-		//	receiver: user,
-		//	score: score
-		//})
-
-		return score;
 	}
 
 	/**
@@ -325,8 +318,8 @@ class ReputationManager extends InteractionHandler {
 	 * Formats the mentions and stats for a list of 
 	 * recipients, and an optional list of corresponding scores.
 	 *
-	 * @param {User[]}   recipients
-	 * @param {Scorep[]} [scores]
+	 * @param {User[]}    recipients - One or more Users who are receiving points
+	 * @param {Scorep[]} [scores]    - The scores of those users after gaining those points
 	 * @return {string} 
 	 * @memberof ReputationManager
 	 */
