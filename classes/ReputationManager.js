@@ -154,12 +154,7 @@ class ReputationManager extends InteractionHandler {
 	 * @memberof ReputationManager
 	 */
 	async giveCommand(interaction, options) {
-		if (interaction.member.user.id == options.user) {
-			return await this.bot.respond(interaction, {
-				content: `You may not give yourself ${this.config.points.name}.`,
-				flags: InteractionHandler.ephemeral
-			});
-		}
+		if (!await this.checkPermissions(interaction, options)) return;
 
 		const user = await this.client.users.fetch(options.user);
 
@@ -191,6 +186,45 @@ class ReputationManager extends InteractionHandler {
 
 		console.log(message);
 		return response;
+	}
+
+	async checkPermissions(interaction, options) {
+		const roles  = interaction.member.roles;
+		const perms  = this.config.permissions;
+		const points = this.config.points.name;
+
+		let failed = "";
+
+		// No restrictions
+		if (roles.includes(perms.giveUnlimited)) return true;
+
+		// May not give to self
+		if (interaction.member.user.id == options.user)
+			failed = `You may not give yourself ${points}.`;
+
+		// May not exceed limit
+		if (options.amount > perms.giveManyLimit || 
+			options.amount < -perms.giveManyLimit)
+			failed = `You may not give more than ${perms.giveManyLimit} ${points}.`;
+
+		// May not exceed one
+		if (!roles.includes(perms.giveMany) &&
+			options.amount > 1)
+			failed = `You may not give multiple ${points} at once.`;
+		
+		// May not be negative
+		if (!roles.includes(perms.giveNegative) &&
+			options.amount < 0)
+			failed = `You may not give negative ${points}.`;
+
+		// If the string is still empty, no permissions violations have occured
+		if (!failed) return true;
+
+		// Otherwise, respond ephemerally
+		await this.bot.respond(interaction, {
+			content: failed,
+			flags: InteractionHandler.ephemeral
+		});
 	}
 
 	/**
