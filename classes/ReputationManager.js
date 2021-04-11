@@ -70,7 +70,7 @@ class ReputationManager extends InteractionHandler {
 	 * @memberof ReputationManager
 	 */
 	async handleMessage(message) {
-		if (!this._testMessage(message)) return;
+		if (!this._testMessage(message) || !message.mentions.users.size) return;
 
 		const newScores = await Promise.all(
 			message.mentions.users.map(user =>
