@@ -70,20 +70,29 @@ class ReputationManager extends InteractionHandler {
 	 * @memberof ReputationManager
 	 */
 	async handleMessage(message) {
-		if (!this._testMessage(message) || !message.mentions.users.size) return;
+		// Stop if there are no mentions. Test the message for triggers.
+		if (!message.mentions.users.size || !this._testMessage(message)) return;
 
-		const newScores = await Promise.all(
-			message.mentions.users.map(user =>
-				this._giveMessageRep(user, message)
-			)
-		);
+		// Convert users to an array, and remove any mentions that are the author
+		const users = [...message.mentions.users.values()]
+			.filter(user => user.id != message.author.id);
 
+		// Return if there are no users
+		if (!users.length) return;
+
+		// Give the rep, and get the new scores
+		const newScores = await Promise.all(users.map(user =>
+			this._giveMessageRep(user, message)
+		));
+
+		// Construct the response string
 		const response = this.buildRepResponse({
 			sender: message.author, 
-			recipients: [...message.mentions.users.values()],
+			recipients: users,
 			scores: newScores
 		});
 
+		// Send the message
 		return await message.reply(response, this.noPing);
 	}
 
