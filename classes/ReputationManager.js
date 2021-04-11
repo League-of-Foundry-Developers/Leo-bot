@@ -122,8 +122,7 @@ class ReputationManager extends InteractionHandler {
 			messageId: message.id
 		});
 
-		return score = await this.getScore(rep.user);
-
+		return await this.getScore(rep.user);
 	}
 
 	/**
