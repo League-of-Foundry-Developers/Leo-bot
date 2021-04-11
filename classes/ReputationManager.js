@@ -72,13 +72,19 @@ class ReputationManager extends InteractionHandler {
 	async handleMessage(message) {
 		if (!this._testMessage(message)) return;
 
-		const responses = await Promise.all(
+		const newScores = await Promise.all(
 			message.mentions.users.map(user =>
 				this._giveMessageRep(user, message)
 			)
 		);
 
-		return await message.reply(responses.join("\n"), this.noPing);
+		const response = this.buildRepResponse({
+			sender: message.author, 
+			recipients: [...message.mentions.users.values()],
+			scores: newScores
+		});
+
+		return await message.reply(response, this.noPing);
 	}
 
 	/**
@@ -118,13 +124,13 @@ class ReputationManager extends InteractionHandler {
 
 		const score = await this.getScore(rep.user);
 
-		const response = this.buildRepResponse(rep, {
-			sender: message.author,
-			receiver: user,
-			score: score
-		})
+		//const response = this.buildRepResponse(rep, {
+		//	sender: message.author,
+		//	receiver: user,
+		//	score: score
+		//})
 
-		return response;
+		return score;
 	}
 
 	/**
@@ -154,9 +160,11 @@ class ReputationManager extends InteractionHandler {
 			where: { user: user.id }
 		}) || { score: 0, rank: 0 };
 
-		const message = this.buildRepResponse(delta, {
+		const message = this.buildRepResponse({
+			amount: delta.delta,
 			sender: interaction.member.user,
-			receiver: user,
+			recipients: [user],
+			scores: [score],
 			giveReason: delta.reason
 		})
 
@@ -290,28 +298,47 @@ class ReputationManager extends InteractionHandler {
 	/**
 	 * Constructs a response string for when reputation is given.
 	 *
-	 * @param {Reputation}  reputation
-	 * @param {object}      options             - An object of optional parameters
-	 * @param {User}       [options.sender]     - The user that gave the reputation
-	 * @param {User}       [options.receiver]   - The user that received the reputaion
-	 * @param {Channel}    [options.channel]    - The channel in which the reputation was given
-	 * @param {Message}    [options.message]    - The message to which the reputation was given
-	 * @param {Score}      [options.score]      - The current reputation stats for the receiver
-	 * @param {string}     [options.giveReason] - A reason why the giver gave the receiver points
+	 * @param {object}       params             - An object of parameters
+	 * @param {number}      [params.amount]     - The number of points given (default: 1)
+	 * @param {User}        [params.sender]     - The user that gave the reputation
+	 * @param {User[]}       params.recipients  - The user(s) that received the reputaion
+	 * @param {Channel}     [params.channel]    - The channel in which the reputation was given
+	 * @param {Message}     [params.message]    - The message to which the reputation was given
+	 * @param {Score[]}     [params.scores]     - The current reputation stats for the recipient(s)
+	 * @param {string}      [params.giveReason] - A reason why the giver gave the receiver points
 	 * @return {string}                           The message responding to the reputation giving event
 	 * @memberof ReputationManager
 	 */
-	buildRepResponse(reputation, { sender, receiver, channel, message, score, giveReason }={}) {
-		const intro = sender ? `<@!${sender.id}> gave` : "Gave";
-		const sign = reputation.delta > 0 ? "+" : "";
-		const amount = reputation.delta == 1 // If the amount of rep given is one, use the +1 emote instead of a number to indicate the amount
-			? `<:${this.config.emotes.plusone.name}:${this.config.emotes.plusone.id}>`
-			: `${sign}${reputation.delta}`;
-		const recipient = `<@!${reputation.user}>`;
-		const stats = score ? ` (current: \`#${score.rank}\` - \`${score.score}\`)` : "";
-		const reason = giveReason ? ` Reason: \n> ${giveReason}` : "";
+	buildRepResponse({ amount=1, sender, recipients, channel, message, scores, giveReason }) {
+		const intro     = sender ? `<@!${sender.id}> gave` : "Gave";
+		const sign      = amount > 0 ? "+" : "";
+		const amnt      = amount == 1 // If the amount of rep given is one, use the +1 emote instead of a number to indicate the amount
+							? `<:${this.config.emotes.plusone.name}:${this.config.emotes.plusone.id}>`
+							: `${sign}${amount}`;
+		const recipient = this.formatRecipients(recipients, scores);
+		const reason    = giveReason || "";
 		
-		return `${intro} **${amount}** ${this.config.points.name} to ${recipient}.${stats}${reason}`;
+		return `${intro} **${amnt}** ${this.config.points.name} to ${recipient} ${reason}`;
+	}
+
+	/**
+	 * Formats the mentions and stats for a list of 
+	 * recipients, and an optional list of corresponding scores.
+	 *
+	 * @param {User[]}   recipients
+	 * @param {Scorep[]} [scores]
+	 * @return {string} 
+	 * @memberof ReputationManager
+	 */
+	formatRecipients(recipients, scores) {
+		return recipients.reduce((str, recipient, i) => {
+			const and         = i == recipients.length - 1 ? "and " : "";
+			const conjunction = i ? (recipients.length == 2 ? ` ${and}` : `, ${and}`) : "";
+			const user        = `<@!${recipient.id}>`;
+			const stats       = scores ? ` (**#${scores[i].rank}** • ${scores[i].score})` : "";
+
+			return `${str}${conjunction}${user}${stats}`
+		}, "")
 	}
 
 	/**
