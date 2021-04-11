@@ -49,7 +49,15 @@ class ReputationManager extends InteractionHandler {
 	 * @memberof ReputationManager
 	 */
 	async handleReaction(reaction, user) {
-		if (reaction._emoji.id != this.config.emotes.plusone.id) return;
+		// If it's not the right emote, or it's the message author reacting, return
+		if (reaction._emoji.id != this.config.emotes.plusone.id ||
+			reaction.message.author.id == user.id) return;
+
+		// If this user already reacted to this message, return
+		if(await Reputation.findOne({ where: { 
+			messageId: reaction.message.id,
+			giverId: user.id
+		}})) return;
 
 		return await this.giveRep({
 			user: reaction.message.author.id,
