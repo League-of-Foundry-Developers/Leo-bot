@@ -29,7 +29,7 @@ async function main() {
 	}});
 	console.log("Created /package");
 
-	await client.api.applications(client.user.id).guilds(config.guild).commands.post({data: {
+/*	await client.api.applications(client.user.id).guilds(config.guild).commands.post({data: {
 		"options": [
 			{
 				"type": 7,
@@ -49,36 +49,7 @@ async function main() {
 		"name": "say",
 		"description": "Have Leo speak for you."
 	}});
-	console.log("Created /say");
-
-	await client.api.applications(client.user.id).guilds(config.guild).commands.post({data: {
-		"options": [
-			{
-				"type": 6,
-				"name": "user",
-				"description": "Who would you like to give points to?",
-				"default": false,
-				"required": true
-			},
-			{
-				"type": 4,
-				"name": "amount",
-				"description": "How many points would you like to give??",
-				"default": false,
-				"required": false
-			},
-			{
-				"type": 3,
-				"name": "reason",
-				"description": "Why are you giving them points?",
-				"default": false,
-				"required": false
-			}
-		],
-		"name": "giverep",
-		"description": "Give another user League Points"
-	}});
-	console.log("Created /giverep");
+	console.log("Created /say");*/
 
 	await client.api.applications(client.user.id).guilds(config.guild).commands.post({data: {
 		"name": "rep",
@@ -110,15 +81,15 @@ async function main() {
 						"required": true
 					},
 					{
-						"type": 4,
-						"name": "amount",
-						"description": "How much reputation would you like to give?",
+						"type": 3,
+						"name": "reason",
+						"description": `Why are you giving them reputation? Ex "for being so cool"`,
 						"required": false
 					},
 					{
-						"type": 3,
-						"name": "reason",
-						"description": "Why are you giving them reputation?",
+						"type": 4,
+						"name": "amount",
+						"description": "Moderators only: How much reputation would you like to give?",
 						"required": false
 					}
 				]
