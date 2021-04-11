@@ -154,6 +154,13 @@ class ReputationManager extends InteractionHandler {
 	 * @memberof ReputationManager
 	 */
 	async giveCommand(interaction, options) {
+		if (interaction.member.user.id == options.user) {
+			return await this.bot.respond(interaction, {
+				content: `You may not give yourself ${this.config.points.name}.`,
+				flags: InteractionHandler.ephemeral
+			});
+		}
+
 		const user = await this.client.users.fetch(options.user);
 
 		const delta = await Reputation.create({
