@@ -177,11 +177,11 @@ module.exports.Leo = Leo;
 // A command to make Leo send a message in a certain channel,
 // Useless without better permissions system
 async function handleSayCommand(interaction) {
-	console.log(client.channels);
+	Leo.debug(client.channels);
 	const channel = interaction.data.options.find(o => o.name == "channel")?.value;
 	const message = interaction.data.options.find(o => o.name == "message")?.value;
 
-	console.log(`
+	Leo.debug(`
 		Sending message on channel: ${channel}
 		> ${message}
 	`);

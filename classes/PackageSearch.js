@@ -1,3 +1,4 @@
+const { Leo } = require("../Leo.js");
 const { InteractionHandler } = require("./InteractionHandler.js");
 const { Package } = require("./Package.js");
 const { strings } = require("./stringTemplates.js");
@@ -49,7 +50,7 @@ class PackageSearch extends InteractionHandler {
 	 * @memberof PackageSearch
 	 */
 	async command(interaction, options) {
-		console.log(options);
+		Leo.debug(options);
 		return await this.bot.respond(
 			interaction, 
 			await this.getPackageResponse(
@@ -90,13 +91,13 @@ class PackageSearch extends InteractionHandler {
 	 * @memberof PackageSearch
 	 */
 	handlePackageError(pkg) {
-		console.log("Package errors!")
+		Leo.debug("Package errors!")
 
 		let /* Generic Error */   error = strings.packageError(pkg);
 		if  (pkg.manifestInvalid) error = strings.validationError(pkg);
 		if  (pkg.notFound)        error = strings.searchResults(pkg);
 
-		console.log(error);
+		Leo.debug(error);
 
 		return { content: error, flags: InteractionHandler.ephemeral }
 	}
