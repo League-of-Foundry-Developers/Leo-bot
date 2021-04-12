@@ -8,7 +8,7 @@ This allows you to configure seperate settings for an in-developement environmen
 - `dev.config.json`: For a personal development Discord server
 
 ## Example config.json file
-**Do not allow your token to become public, do not commit you config.json file to Git, or share it anywhere**
+**Do not allow your token to become public, do not commit your config.json file to Git, or share it anywhere**
 ```json
 {
 	"token": "<your bot token>",
