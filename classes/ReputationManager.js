@@ -1,6 +1,6 @@
 const columnify = require('columnify');
 const { Reputation, Score } = require("../database.js");
-const { Leo } = require('../Leo.js');
+const { utils } = require("../utils.js");
 const { InteractionHandler } = require('./InteractionHandler.js');
 
 /**
@@ -185,7 +185,7 @@ class ReputationManager extends InteractionHandler {
 			allowed_mentions: { "users": [user.id] }
 		});
 
-		Leo.debug(message);
+		utils.debug(message);
 		return response;
 	}
 
@@ -264,7 +264,7 @@ class ReputationManager extends InteractionHandler {
 			allowed_mentions: { "parse": [] }
 		});
 
-		Leo.debug(message);
+		utils.debug(message);
 		return response;
 	}
 
@@ -288,8 +288,8 @@ class ReputationManager extends InteractionHandler {
 			embeds: [scoreboard]
 		});
 
-		Leo.debug(message);
-		Leo.debug(scoreboard.description);
+		utils.debug(message);
+		utils.debug(scoreboard.description);
 		return response;
 	}
 

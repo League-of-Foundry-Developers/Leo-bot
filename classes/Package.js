@@ -1,5 +1,5 @@
 const fetch = require("node-fetch");
-const { Leo } = require("../Leo");
+const { utils } = require("../utils.js");
 
 /**
  * Represents the data for a Foundry package,
@@ -83,7 +83,7 @@ class Package {
 	 * @memberof Package
 	 */
 	async init() {
-		Leo.debug(this.fromManifest);
+		utils.debug(this.fromManifest);
 		if (this.fromManifest) await this.getManifest();
 		else await Promise.all([
 			this.getBazaar(),

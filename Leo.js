@@ -1,3 +1,4 @@
+const { utils } = require("./utils.js");
 const { PackageSearch } = require("./classes/PackageSearch.js");
 const { ReputationManager } = require("./classes/ReputationManager.js");
 
@@ -45,18 +46,6 @@ class Leo {
 	}
 
 	/**
-	 * Sends a message to the console only if debug mode is on.
-	 *
-	 * @param {Array} args - Any arguments, which are passed directly to console.debug
-	 * @return {void}        Returns early if debugging is disabled 
-	 * @memberof Leo
-	 */
-	static debug(...args) {
-		if (!this.config.debug) return;
-		console.debug(...args);
-	}
-
-	/**
 	 * Wraps fetching the remaining data for a partial Discord.js structure
 	 * in a condition and error handling.
 	 *
@@ -96,7 +85,7 @@ class Leo {
 	 */
 	async onMessage(message) {
 		if (message.author.bot) return;
-		Leo.debug(message);
+		utils.debug(message);
 		
 		try {
 			await Promise.all([
@@ -117,7 +106,7 @@ class Leo {
 	 */
 	async onMessageReactionAdd(reaction, user) {
 		if (!await this.fetchPartial(reaction)) return;
-		Leo.debug(reaction, user);
+		utils.debug(reaction, user);
 
 		try{
 			await Promise.all([
@@ -133,7 +122,7 @@ class Leo {
 	 * @memberof Leo
 	 */
 	async onInteractionCreate(interaction) {
-		Leo.debug(interaction);
+		utils.debug(interaction);
 
 		try {
 			await Promise.all([
@@ -177,11 +166,11 @@ module.exports.Leo = Leo;
 // A command to make Leo send a message in a certain channel,
 // Useless without better permissions system
 async function handleSayCommand(interaction) {
-	Leo.debug(client.channels);
+	utils.debug(client.channels);
 	const channel = interaction.data.options.find(o => o.name == "channel")?.value;
 	const message = interaction.data.options.find(o => o.name == "message")?.value;
 
-	Leo.debug(`
+	utils.debug(`
 		Sending message on channel: ${channel}
 		> ${message}
 	`);
