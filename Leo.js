@@ -161,6 +161,8 @@ export default class Leo {
 	 * @memberof Leo
 	 */
 	async respond(interaction, data) {
+		this.cleanData(data);
+
 		// Send the response
 		await this.client.api.interactions(interaction.id, interaction.token)
 			.callback.post({ data: { type: 4, data: data } });
@@ -177,6 +179,46 @@ export default class Leo {
 
 		// Construct a Discord.js Message object around the message data, and return
 		return new Message(this.client, response, channel);
+	}
+
+	/**
+	 * Checks each field in the response, and ensures they do not exceed their maximum length.
+	 *
+	 * Does not protect against too many embeds, too many fields, or embeds with
+	 * greater than 6000 total characters.
+	 *
+	 * @param {InteractionResponse} data - The response data
+	 * @memberof Leo
+	 */
+	cleanData(data) {
+		const contentMax = 2000;
+		const titleMax   = 256;  const authorMax  = 256; const descrMax   = 2048;
+		const footerMax  = 2048; const nameMax    = 256; const valueMax   = 1024;
+
+		if (data.content?.length > contentMax)
+			data.content = data.content.substring(0, contentMax - 3) + "...";
+
+		data.embeds?.foEach(embed => {
+			if (embed.title?.length > descrMax)
+				embed.title = embed.title.substring(0, titleMax - 3) + "...";
+
+			if (embed.author?.length > descrMax)
+				embed.author = embed.author.substring(0, authorMax - 3) + "...";
+				
+			if (embed.description?.length > descrMax)
+				embed.description = embed.description.substring(0, descrMax - 3) + "...";
+
+			if (embed.footer?.length > descrMax)
+				embed.footer = embed.footer.substring(0, footerMax - 3) + "...";
+
+			embed.fields?.forEach(field => {
+				if (field.name?.length > descrMax)
+					field.name = field.name.substring(0, nameMax - 3) + "...";
+
+				if (field.value?.length > descrMax)
+					field.value = field.value.substring(0, valueMax - 3) + "...";
+			});
+		});
 	}
 }
 
