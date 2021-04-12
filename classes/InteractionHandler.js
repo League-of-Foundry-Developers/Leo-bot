@@ -33,9 +33,12 @@ export default class InteractionHandler {
 		this.bot = bot;
 	}
 
+	/** @type    { LeoConfig } */
 	get config() { return this.bot.config; }
+	/** @type    { Client}    */
 	get client() { return this.bot.client; }
-	get sql()    { return this.bot.sql;    }
+	/** @type    { Sequelize} */
+	get sql()    { return this.bot.sql; }
 
 	/**
 	 * The name of the /slash command that this class handles

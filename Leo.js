@@ -25,8 +25,11 @@ export default class Leo {
 	 * @memberof Leo
 	 */
 	constructor(config, sql, client) {
+		/** @type {LeoConfig} */
 		this.config = config;
+		/** @type {Sequelize} */
 		this.sql = sql;
+		/** @type {Client} */
 		this.client = client;
 
 		this.reputation = new ReputationManager(this);
