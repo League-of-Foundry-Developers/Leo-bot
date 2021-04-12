@@ -1,4 +1,5 @@
-const { Sequelize, DataTypes, Model } = require("sequelize");
+import sequelize from 'sequelize';
+const { Sequelize, DataTypes, Model } = sequelize;
 
 //const sequelize = new Sequelize("sqlite:./leo.db");
 
@@ -32,7 +33,7 @@ class View extends EnhancedModel {
 	}
 }
 
-class Score extends View {
+export class Score extends View {
 	static get createCode() {
 		return /* sql */`
 		SELECT 
@@ -95,7 +96,7 @@ class Score extends View {
  * @class Reputation
  * @extends {EnhancedModel}
  */
-class Reputation extends EnhancedModel {
+export class Reputation extends EnhancedModel {
 	static get schema() {
 		return {
 			user: {
@@ -119,6 +120,3 @@ class Reputation extends EnhancedModel {
 		}
 	}
 }
-
-module.exports.Reputation = Reputation;
-module.exports.Score = Score;

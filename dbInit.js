@@ -1,7 +1,8 @@
-/** @type {LeoConfig} */
-const config = require(process.argv[2]);
-const { Reputation, Score } = require("./database.js");
-const { Sequelize } = require("sequelize");
+import config from "./config.cjs";
+import { Reputation, Score } from "./database.js";
+import seq from 'sequelize';
+
+const { Sequelize } = seq;
 
 const sequelize = new Sequelize({
 	dialect: "sqlite",

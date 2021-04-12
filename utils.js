@@ -1,6 +1,5 @@
-const config = require(process.argv[2]);
-
-class Utils {
+import config from "./config.cjs";
+export default class Utils {
 	/**
 	 * Sends a message to the console only if debug mode is on.
 	 *
@@ -13,5 +12,3 @@ class Utils {
 		console.debug(...args);
 	}
 }
-
-module.exports.utils = Utils;

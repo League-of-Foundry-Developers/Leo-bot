@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "League of Exaordinary Foundry VTT Developers Discord Bot",
   "main": "main.js",
+  "type": "module",
   "scripts": {
     "leo": "node main.js ./config.json",
     "leo-test": "node main.js ./test.config.json",

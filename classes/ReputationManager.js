@@ -1,7 +1,7 @@
-const columnify = require('columnify');
-const { Reputation, Score } = require("../database.js");
-const { utils } = require("../utils.js");
-const { InteractionHandler } = require('./InteractionHandler.js');
+import columnify from 'columnify';
+import { Reputation, Score } from "../database.js";
+import utils from "../utils.js";
+import InteractionHandler from './InteractionHandler.js';
 
 /**
  * @typedef {import("../Leo.js").Leo} Leo 
@@ -22,7 +22,7 @@ const { InteractionHandler } = require('./InteractionHandler.js');
  *
  * @class ReputationManager
  */
-class ReputationManager extends InteractionHandler {
+export default class ReputationManager extends InteractionHandler {
 	/** @readonly @override */
 	get commandName() { return "rep"; }
 
@@ -417,5 +417,3 @@ class ReputationManager extends InteractionHandler {
 		return score  || { score: 0, rank: " No points" };
 	}
 }
-
-module.exports.ReputationManager = ReputationManager;

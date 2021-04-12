@@ -1,4 +1,4 @@
-class Strings {
+export default class Strings {
 
 /**
  * @param {object} params
@@ -115,4 +115,3 @@ ${validationError}
 }
 
 }
-module.exports.strings = Strings;

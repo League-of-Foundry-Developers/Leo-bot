@@ -4,7 +4,7 @@
  *
  * @class InteractionHandler
  */
-class InteractionHandler {
+export default class InteractionHandler {
 	/**
 	 * Extracts the options from a command into a key:value pair.
 	 *
@@ -75,5 +75,3 @@ class InteractionHandler {
 		);
 	}
 }
-
-module.exports.InteractionHandler = InteractionHandler;

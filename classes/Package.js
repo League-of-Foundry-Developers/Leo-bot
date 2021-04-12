@@ -1,5 +1,5 @@
-const fetch = require("node-fetch");
-const { utils } = require("../utils.js");
+import fetch from "node-fetch";
+import utils from "../utils.js";
 
 /**
  * Represents the data for a Foundry package,
@@ -8,7 +8,7 @@ const { utils } = require("../utils.js");
  *
  * @class Package
  */
-class Package {
+export default class Package {
 	/**
 	 * A factory method that creates an initializes a Package object.
 	 *
@@ -332,5 +332,3 @@ class Package {
 	/** @type {string} The URL of the package website */
 	get url() { return this.manifest.url; };
 }
-
-module.exports.Package = Package;

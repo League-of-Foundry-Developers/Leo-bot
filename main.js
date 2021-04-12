@@ -1,10 +1,14 @@
-const config = require(process.argv[2]);
-const { utils } = require("./utils.js");
-const Discord = require("discord.js");
-const fetch = require("node-fetch");
-const { Sequelize } = require("sequelize");
-const { Leo } = require("./Leo.js");
-const { Reputation, Score } = require("./database.js");
+import config from "./config.cjs";
+
+import discord from "discord.js";
+import seq from 'sequelize';
+
+import utils from "./utils.js";
+import Leo from "./Leo.js";
+
+const { Client, Intents } = discord;
+const { Sequelize, DataTypes, Model } = seq;
+
 
 const sequelize = new Sequelize({
 	dialect: "sqlite",
@@ -12,9 +16,9 @@ const sequelize = new Sequelize({
 	logging: utils.debug
 });
 
-const client = new Discord.Client({
+const client = new Client({
 	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-	intents: Discord.Intents.NON_PRIVILEGED
+	intents: Intents.NON_PRIVILEGED
 });
 
 async function main() {

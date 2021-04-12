@@ -1,6 +1,6 @@
-const { utils } = require("./utils.js");
-const { PackageSearch } = require("./classes/PackageSearch.js");
-const { ReputationManager } = require("./classes/ReputationManager.js");
+import utils from "./utils.js";
+import PackageSearch from "./classes/PackageSearch.js";
+import ReputationManager from "./classes/ReputationManager.js";
 
 /**
  * @typedef {import("discord.js").Client} Client
@@ -15,7 +15,7 @@ const { ReputationManager } = require("./classes/ReputationManager.js");
  *
  * @class Leo
  */
-class Leo {
+export default class Leo {
 	/**
 	 * Creates an instance of Leo.
 	 *
@@ -159,7 +159,6 @@ class Leo {
 	}
 }
 
-module.exports.Leo = Leo;
 
 /* Leftovers from earlier development not yet re-factored
 

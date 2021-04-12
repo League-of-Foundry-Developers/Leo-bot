@@ -1,7 +1,7 @@
-const { utils } = require("../utils.js");
-const { InteractionHandler } = require("./InteractionHandler.js");
-const { Package } = require("./Package.js");
-const { strings } = require("./stringTemplates.js");
+import utils from "../utils.js";
+import InteractionHandler from "./InteractionHandler.js";
+import Package from "./Package.js";
+import strings from "./stringTemplates.js";
 
 /**
  * @typedef {import("discord.js").MessageEmbed} MessageEmbed
@@ -14,7 +14,7 @@ const { strings } = require("./stringTemplates.js");
  *
  * @class PackageSearch
  */
-class PackageSearch extends InteractionHandler {
+export default class PackageSearch extends InteractionHandler {
 	/** @readonly @override /package name:name manifest?:url */
 	get commandName() { return "package"; }
 
@@ -173,5 +173,3 @@ class PackageSearch extends InteractionHandler {
 		return { valid, error };
 	}
 }
-
-module.exports.PackageSearch = PackageSearch;

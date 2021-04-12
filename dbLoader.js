@@ -5,28 +5,30 @@
  * and the second is data exported from YAGPDB.xyz
  */
 
-/** @type {LeoConfig} */
-const config = require(process.argv[2]);
-const { Reputation } = require("./database.js");
-const { Sequelize } = require("sequelize");
+import config from "./config.cjs";
+import { Reputation } from "./database.js";
+import seq from 'sequelize';
+import fs from "fs/promises";
+
+const { Sequelize } = seq;
 
 const sequelize = new Sequelize({
 	dialect: "sqlite",
 	storage: config.database
 });
 
-const data = require(process.argv[3]);
-
 async function main() {
 	Reputation.init(sequelize);
 
 	await Reputation.sync({ alter: true });
 
-	await insertData();
+	const data = JSON.parse(await fs.readFile(process.argv[3]));
+
+	await insertData(data);
 }
 
-async function insertData() {
-	toInsert = data.map(d => ({
+async function insertData(data) {
+	const toInsert = data.map(d => ({
 		user: d.receiver_id,
 		delta: d.amount,
 		reason: "Imported from YAGPDB.xyz",
