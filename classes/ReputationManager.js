@@ -289,7 +289,7 @@ export default class ReputationManager extends InteractionHandler {
 		});
 
 		
-
+		utils.debug(response);
 		utils.debug(message);
 		utils.debug(scoreboard.description);
 		utils.debug(interaction);

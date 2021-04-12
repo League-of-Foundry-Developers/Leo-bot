@@ -1,6 +1,10 @@
+import discord from "discord.js";
+
 import utils from "./utils.js";
 import PackageSearch from "./classes/PackageSearch.js";
 import ReputationManager from "./classes/ReputationManager.js";
+
+const { Client, Message } = discord;
 
 /**
  * @typedef {import("discord.js").Client} Client
@@ -156,9 +160,20 @@ export default class Leo {
 	 * @memberof Leo
 	 */
 	async respond(interaction, data) {
-		return await this.client.api
+		console.log("Function: ", this.client.api
 			.interactions(interaction.id, interaction.token)
+			.callback.post);
+
+		const channel = await this.client.channels.fetch(interaction.channel_id);
+
+		await this.client.api.interactions(interaction.id, interaction.token)
 			.callback.post({ data: { type: 4, data: data } });
+
+		const response = await this.client.api
+			.webhooks(interaction.application_id, interaction.token, "messages", "@original")
+			.patch({ data: {} });
+
+		return new Message(this.client, response, channel);
 	}
 }
 
