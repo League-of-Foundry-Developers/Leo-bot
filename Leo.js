@@ -198,7 +198,7 @@ export default class Leo {
 		if (data.content?.length > contentMax)
 			data.content = data.content.substring(0, contentMax - 3) + "...";
 
-		data.embeds?.foEach(embed => {
+		data.embeds?.forEach(embed => {
 			if (embed.title?.length > descrMax)
 				embed.title = embed.title.substring(0, titleMax - 3) + "...";
 
