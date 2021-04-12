@@ -155,24 +155,27 @@ export default class Leo {
 	/**
 	 * Sends a response to an interaction
 	 *
-	 * @param {Interaction} interaction
-	 * @param {InteractionResponse} data
+	 * @param {Interaction} interaction  - The interaction to respond to
+	 * @param {InteractionResponse} data - The response data
+	 * @return {Promise<Message>}          The message that was sent in response
 	 * @memberof Leo
 	 */
 	async respond(interaction, data) {
-		console.log("Function: ", this.client.api
-			.interactions(interaction.id, interaction.token)
-			.callback.post);
-
-		const channel = await this.client.channels.fetch(interaction.channel_id);
-
+		// Send the response
 		await this.client.api.interactions(interaction.id, interaction.token)
 			.callback.post({ data: { type: 4, data: data } });
 
+		// Get the channel of the interaction
+		const channel = await this.client.channels.fetch(interaction.channel_id);
+
+		// Fetch the response message by using PATCH on the special endpoint.
+		// This is not the "correct" way to do this, but the API is not mature yet.
+		// Nevertheless, this will return the message data.
 		const response = await this.client.api
 			.webhooks(interaction.application_id, interaction.token, "messages", "@original")
 			.patch({ data: {} });
 
+		// Construct a Discord.js Message object around the message data, and return
 		return new Message(this.client, response, channel);
 	}
 }
