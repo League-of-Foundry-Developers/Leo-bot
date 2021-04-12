@@ -51,7 +51,7 @@ export default class ReputationManager extends InteractionHandler {
 	 */
 	async handleReaction(reaction, user) {
 		// If it's not the right emote, or it's the message author reacting, return
-		if (reaction._emoji.id != this.config.emotes.plusone.id ||
+		if (reaction.emoji.id != this.config.emotes.plusone.id ||
 			reaction.message.author.id == user.id) return;
 
 		// If this user already reacted to this message, return
@@ -288,8 +288,11 @@ export default class ReputationManager extends InteractionHandler {
 			embeds: [scoreboard]
 		});
 
+		
+
 		utils.debug(message);
 		utils.debug(scoreboard.description);
+		utils.debug(interaction);
 		return response;
 	}
 
