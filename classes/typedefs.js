@@ -63,7 +63,7 @@
  */
 
 /** 
- * @typedef {InteractionApplicationCommandCallbackData} InteractionResposne
+ * @typedef {InteractionApplicationCommandCallbackData} InteractionResponse
  *//**
  * @typedef  {object} InteractionApplicationCommandCallbackData
  * @property {boolean}                                  [tts]              - is the response TTS

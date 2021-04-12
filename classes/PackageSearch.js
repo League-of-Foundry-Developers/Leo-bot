@@ -45,7 +45,7 @@ class PackageSearch extends InteractionHandler {
 	 *
 	 * @param {Interaction}              interaction - Information about the interaction
 	 * @param {Array<InteractionOption>} options     - Information about the interaction
-	 * @return {InteractionResposne}                   The response object
+	 * @return {InteractionResponse}                   The response object
 	 * @memberof PackageSearch
 	 */
 	async command(interaction, options) {
@@ -65,7 +65,7 @@ class PackageSearch extends InteractionHandler {
 	 *
 	 * @param {string} name        - The `name` of the package
 	 * @param {string} [manifest]  - The URL of the package manifest
-	 * @return {InteractionResposne} The data for the resposne
+	 * @return {InteractionResponse} The data for the resposne
 	 * @memberof PackageSearch
 	 */
 	async getPackageResponse(name, manifest) {
@@ -86,7 +86,7 @@ class PackageSearch extends InteractionHandler {
 	 * that used the command will see them.
 	 *
 	 * @param {Package} pkg - The package data
-	 * @return {InteractionResposne}
+	 * @return {InteractionResponse}
 	 * @memberof PackageSearch
 	 */
 	handlePackageError(pkg) {

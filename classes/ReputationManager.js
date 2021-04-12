@@ -150,7 +150,7 @@ class ReputationManager extends InteractionHandler {
 	 *
 	 * @param {Interaction}              interaction - Information about the interaction
 	 * @param {Array<InteractionOption>} options     - Information about the interaction
-	 * @return {object}                                The response object
+	 * @return {InteractionResponse}                   The response object
 	 * @memberof ReputationManager
 	 */
 	async giveCommand(interaction, options) {
@@ -188,6 +188,15 @@ class ReputationManager extends InteractionHandler {
 		return response;
 	}
 
+	/**
+	 * Checks the action being taken against a set of permissions
+	 * configured in the config.json file.
+	 *
+	 * @param {Interaction}         interaction - The interaction being verified
+	 * @param {InteractionOption[]} options     - The associated parameters
+	 * @return {boolean}                          True if the user has permission to proceed 
+	 * @memberof ReputationManager
+	 */
 	async checkPermissions(interaction, options) {
 		const roles  = interaction.member.roles;
 		const perms  = this.config.permissions;
@@ -225,6 +234,8 @@ class ReputationManager extends InteractionHandler {
 			content: failed,
 			flags: InteractionHandler.ephemeral
 		});
+
+		return false;
 	}
 
 	/**
@@ -235,7 +246,7 @@ class ReputationManager extends InteractionHandler {
 	 *
 	 * @param {Interaction}              interaction - Information abour the interaction
 	 * @param {Array<InteractionOption>} options     - Information abour the interaction
-	 * @return {object}                                The response object
+	 * @return {InteractionResponse}                   The response object
 	 * @memberof ReputationManager
 	 */
 	async checkCommand(interaction, options) {
@@ -264,7 +275,7 @@ class ReputationManager extends InteractionHandler {
 	 *
 	 * @param {Interaction}              interaction - Information abour the interaction
 	 * @param {Array<InteractionOption>} options     - Information abour the interaction
-	 * @return {object}                                The response object
+	 * @return {InteractionResponse}                   The response object
 	 * @memberof ReputationManager
 	 */
 	async scoreboardCommand(interaction, options) {
