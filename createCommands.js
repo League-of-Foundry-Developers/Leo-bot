@@ -1,9 +1,12 @@
-/** @type {LeoConfig} */
-const config = require(process.argv[2]);
-const Discord = require("discord.js");
-const client = new Discord.Client({
+import config from "./config.cjs";
+
+import discord from "discord.js";
+
+const { Client, Intents } = discord;
+
+const client = new Client({
 	partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-	intents: Discord.Intents.NON_PRIVILEGED
+	intents: Intents.NON_PRIVILEGED
 });
 
 async function main() {
