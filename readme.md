@@ -21,7 +21,8 @@ This allows you to configure seperate settings for an in-developement environmen
 		}
 	},
 	"points": {
-		"name": "Points"
+		"name": "Points",
+		"scoreboardLength": 15
 	},
 	"permissions": {
 		"giveNegative": "<role id>",
