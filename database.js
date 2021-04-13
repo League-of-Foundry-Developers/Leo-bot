@@ -97,6 +97,10 @@ export class Score extends View {
  * @extends {EnhancedModel}
  */
 export class Reputation extends EnhancedModel {
+	async init(...args) {
+		Reputation.belongsTo(User);
+		super.init(...args);
+	}
 	static get schema() {
 		return {
 			user: {
@@ -116,7 +120,52 @@ export class Reputation extends EnhancedModel {
 	static get initOptions() {
 		return {
 			modelName: "Reputation",
-			tableName: "Reputation"
+			tableName: "Reputation",
+			indexes: [
+				{
+					unique: false,
+					fields: ["user"]
+				},
+				{
+					unique: false,
+					fields: ["giverId"]
+				},
+				{
+					unique: false,
+					fields: ["delta"]
+				}
+			]
+		}
+	}
+}
+
+export class User extends EnhancedModel {
+	async init(...args) {
+		User.hasMany(Reputation, {
+			foreignKey: "user",
+			allowNull: false
+		});
+		super.init(...args);
+	}
+	static get schema() {
+		return {
+			user: {
+				type: DataTypes.STRING,
+				allowNull: false
+			},
+			name: DataTypes.STRING,
+			discriminator: DataTypes.STRING
+		}
+	}
+	static get initOptions() {
+		return {
+			modelName: "User",
+			indexes: [
+				{
+					unique: true,
+					fields: ["user"]
+				}
+			]
 		}
 	}
 }

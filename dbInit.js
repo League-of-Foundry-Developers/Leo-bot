@@ -1,6 +1,7 @@
 import config from "./config.cjs";
-import { Reputation, Score } from "./database.js";
+import * as Database from "./database.js";
 import seq from 'sequelize';
+import { User } from "discord.js";
 
 const { Sequelize } = seq;
 
@@ -10,11 +11,13 @@ const sequelize = new Sequelize({
 });
 
 async function main() {
-	Reputation.init(sequelize);
-	Score.init(sequelize);
+	Database.Reputation.init(sequelize);
+	Database.Score.init(sequelize);
+	Database.User.init(sequelize);
 
-	await Reputation.sync({ alter: true });
-	await Score.sync({ alter: true });
+	await Database.Reputation.sync({ alter: true });
+	await Database.Score.sync({ alter: true });
+	await Database.User.sync({ alter: true });
 }
 
 main();
