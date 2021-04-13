@@ -1,4 +1,9 @@
 /**
+ * @typedef {import("discord.js").Client} Client
+ * @typedef {import("sequelize").Sequelize} Sequelize
+ */
+
+/**
  * An abstract class for mechanisms that handle Discord interaction
  * /slash commands and delegate subcommands to specific moethods.
  *
@@ -35,7 +40,7 @@ export default class InteractionHandler {
 
 	/** @type    { LeoConfig } */
 	get config() { return this.bot.config; }
-	/** @type    { Client}    */
+	/** @type    { Client   }    */
 	get client() { return this.bot.client; }
 	/** @type    { Sequelize} */
 	get sql()    { return this.bot.sql; }
