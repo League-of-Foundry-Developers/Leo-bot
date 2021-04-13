@@ -1,5 +1,5 @@
 import discord from "discord.js";
-
+import { User } from "./database.js";
 import utils from "./utils.js";
 import PackageSearch from "./classes/PackageSearch.js";
 import ReputationManager from "./classes/ReputationManager.js";
@@ -10,7 +10,7 @@ const { Client, Message } = discord;
  * @typedef {import("discord.js").Client} Client
  * @typedef {import("discord.js").Message} Message
  * @typedef {import("discord.js").MessageReaction} MessageReaction
- * @typedef {import("discord.js").User} User
+ * @typedef {import("discord.js").User} DiscordUser
  * @typedef {import("sequelize").Sequelize} Sequelize
  */
 
@@ -46,6 +46,7 @@ export default class Leo {
 	 * @memberof Leo
 	 */
 	async init() {
+		await User.init(this.sql);
 		await this.reputation.init();
 		await this.packages.init();
 		await this.createListeners();
@@ -107,7 +108,7 @@ export default class Leo {
 	 * Eats errors.
 	 *
 	 * @param {MessageReaction} reaction - The reaction that was created
-	 * @param {User}            user     - The user who reacted
+	 * @param {DiscordUser}     user     - The user who reacted
 	 * @return {void} 
 	 * @memberof Leo
 	 */
@@ -150,6 +151,67 @@ export default class Leo {
 		this.client.on("messageReactionAdd", this.onMessageReactionAdd.bind(this));
 
 		this.client.ws.on('INTERACTION_CREATE', this.onInteractionCreate.bind(this));
+	}
+
+	async fetchUserInfo(id) {
+		// Default in case the user is not findable
+		let info = {
+			id, name: "User-not-found",
+			discriminator: "0000", tag: "User-not-found#0000"
+		};
+
+		let user, db;
+		
+		// Check the users cache first
+		let cache = this.client.users.cache.get(id);
+
+		if (cache) info = { 
+			id, name: cache.username, 
+			discriminator: cache.discriminator, tag: cache.tag 
+		}
+		else {
+			// If it's not in the cache, check the database
+			db = await User.findOne({ where: { id: id } });
+			console.log(db);
+
+			if (db) info = {
+				id, name: db.name,
+				discriminator: db.discriminator, 
+				tag: `${db.name}#${db.discriminator}`
+			}
+			else {
+				// If it's not in the database, fetch it from Discord
+				user = await this.client.users.fetch(id);
+
+				if (user) info = {
+					id, name: user.username,
+					discriminator: user.discriminator, tag: user.tag
+				}
+			}
+		}
+
+		// Update the database, use the cache or user data if it was already loaded
+		// Do not await this, it can happen in the background.
+		this.updateUserInfo(id, cache || user ? info : null);
+
+		return info;
+	}
+
+	async updateUserInfo(id, info) {
+		// If new data was given, insert it
+		if (info) return await User.upsert(info);
+
+		// Otherwise fetch the data
+		const user = await this.client.users.fetch(id);
+
+		// If no data was found, stop.
+		if (!user) return;
+
+		// Insert the new data
+		return await User.upsert({
+			id, name: user.username,
+			discriminator: user.discriminator
+		})
 	}
 
 	/**
