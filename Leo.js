@@ -153,7 +153,16 @@ export default class Leo {
 		this.client.ws.on('INTERACTION_CREATE', this.onInteractionCreate.bind(this));
 	}
 
-	async fetchUserInfo(id) {
+	async updateUser(id, user) {
+		if (!user) user = await this.client.users.fetch(id);
+
+		await User.upsert({
+			id, name: user.username,
+			discriminator: user.discriminator
+		});
+	}
+
+/*	async fetchUserInfo(id) {
 		// Default in case the user is not findable
 		let info = {
 			id, name: "User-not-found",
@@ -196,8 +205,8 @@ export default class Leo {
 
 		return info;
 	}
-
-	async updateUserInfo(id, info) {
+*/
+/*	async updateUserInfo(id, info) {
 		// If new data was given, insert it
 		if (info) return await User.upsert(info);
 
@@ -213,7 +222,7 @@ export default class Leo {
 			discriminator: user.discriminator
 		});
 	}
-
+*/
 	/**
 	 * Sends a response to an interaction
 	 *
