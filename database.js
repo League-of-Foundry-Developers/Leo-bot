@@ -41,8 +41,7 @@ export class Score extends View {
 			score,
 			latest,
 			initial,
-			dense_rank() OVER (
-				ORDER BY 
+			rank() OVER (
 					score DESC,
 					latest DESC
 			) AS rank 
