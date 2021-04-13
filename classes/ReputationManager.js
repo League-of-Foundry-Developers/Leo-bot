@@ -324,7 +324,7 @@ export default class ReputationManager extends InteractionHandler {
 				return !usr.bot && ["◀", "▶"].includes(reaction.emoji.name) 
 			},
 			// Only wat for 1, stop wating after 5 minutes
-			{ max: 1, time: 300000, errors: ['time'] }
+			{ max: 1, time: 300000 }
 		);
 
 		// Take the first (of one) reaction
