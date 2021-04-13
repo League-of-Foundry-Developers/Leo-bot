@@ -14,6 +14,7 @@
  * @property {string}  emotes.plusone.name       - The :name: of the +1 emote
  * @property {object}  points                    - A group of settings regarding points
  * @property {string}  points.name               - The display name of points
+ * @property {string}  points.scoreboardLength   - How many names per page of the scoreboard to display
  * @property {object}  permissions               - A group of settings regarding permissions
  * @property {string}  permissions.giveNegative  - The Discord snowflake ID of a role which may give negative points (take)
  * @property {string}  permissions.giveMany      - The id of a role that can give more than one point
