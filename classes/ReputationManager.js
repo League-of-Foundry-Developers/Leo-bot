@@ -54,6 +54,8 @@ export default class ReputationManager extends InteractionHandler {
 		if (reaction.emoji.id != this.config.emotes.plusone.id ||
 			reaction.message.author.id == user.id) return;
 
+		this.bot.updateUser(user.id, user);
+
 		// If this user already reacted to this message, return
 		if(await Reputation.findOne({ where: { 
 			messageId: reaction.message.id,
@@ -126,11 +128,12 @@ export default class ReputationManager extends InteractionHandler {
 	 *
 	 * @param {DiscordUser} user    - The user receiving the reputation
 	 * @param {Message}     message - The message in which the user is being "thanked" or otherwise awarded rep
-	 * @param {boolean}     reply   - If true, send the message as a reply to the triggering message
 	 * @return {string}           The response message
 	 * @memberof ReputationManager
 	 */
-	async _giveMessageRep(user, message, reply=false) {
+	async _giveMessageRep(user, message) {
+		this.bot.updateUser(user.id, user);
+
 		const rep = await this.giveRep({
 			user: user.id,
 			delta: 1,
@@ -157,8 +160,9 @@ export default class ReputationManager extends InteractionHandler {
 	async giveCommand(interaction, options) {
 		if (!await this.checkPermissions(interaction, options)) return;
 
-		//const user = await this.client.users.fetch(options.user);
-		const user = { id: options.user }; 
+		const user = { id: options.user };
+
+		this.bot.updateUser(user.id);
 
 		const delta = await Reputation.create({
 			user: user.id,
@@ -252,8 +256,9 @@ export default class ReputationManager extends InteractionHandler {
 	 * @memberof ReputationManager
 	 */
 	async checkCommand(interaction, options) {
-		//const user = await this.client.users.fetch(options.user);
 		const user = { id: options.user };
+
+		this.bot.updateUser(user.id);
 
 		const score = await Score.findOne({
 			where: { user: user.id }
@@ -372,20 +377,11 @@ export default class ReputationManager extends InteractionHandler {
 		const limit = this.config.points.scoreboardLength;
 		const offset = (page - 1) * limit;
 
-		console.time("Query");
 		const scores = await Score.findAll({
 			attributes: ["rank", "score", "user", "tag"],
 			order: [["rank", "ASC"]],
 			offset, limit, raw: true
 		})
-		console.timeEnd("Query");
-
-		console.time("Names");
-		for (let score of scores) {
-			let user = await this.bot.fetchUserInfo(score.user);
-			score.user = user.tag;
-		}
-		console.timeEnd("Names");
 
 		return await this.getScoreboardEmbed(scores, page);
 	}
@@ -402,7 +398,7 @@ export default class ReputationManager extends InteractionHandler {
 		const board = scores.map((s, i) => ({
 			"- Rank -": `#${s.rank}`,
 			"- Points -": s.score,
-			"- User -": s.user
+			"- User -": s.tag
 		}));
 
 		const message = columnify(board, {
