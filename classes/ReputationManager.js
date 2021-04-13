@@ -157,7 +157,8 @@ export default class ReputationManager extends InteractionHandler {
 	async giveCommand(interaction, options) {
 		if (!await this.checkPermissions(interaction, options)) return;
 
-		const user = await this.client.users.fetch(options.user);
+		//const user = await this.client.users.fetch(options.user);
+		const user = { id: options.user }; 
 
 		const delta = await Reputation.create({
 			user: user.id,
@@ -251,7 +252,8 @@ export default class ReputationManager extends InteractionHandler {
 	 * @memberof ReputationManager
 	 */
 	async checkCommand(interaction, options) {
-		const user = await this.client.users.fetch(options.user);
+		//const user = await this.client.users.fetch(options.user);
+		const user = { id: options.user };
 
 		const score = await Score.findOne({
 			where: { user: user.id }
