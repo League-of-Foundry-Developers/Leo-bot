@@ -211,7 +211,7 @@ export default class Leo {
 		return await User.upsert({
 			id, name: user.username,
 			discriminator: user.discriminator
-		})
+		});
 	}
 
 	/**
