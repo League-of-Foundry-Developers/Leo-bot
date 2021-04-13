@@ -44,7 +44,7 @@ async function insertData(data) {
 		.map(d => {
 			const [tag, name, disc] = d.receiver_username.match(/(.+)#([0-9]+)/);
 			return {
-				user: d.receiver_id,
+				id: d.receiver_id,
 				name: name,
 				discriminator: disc
 			}
