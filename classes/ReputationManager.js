@@ -8,7 +8,7 @@ import InteractionHandler from './InteractionHandler.js';
  * 
  * @typedef {import("discord.js").MessageReaction} MessageReaction
  * @typedef {import("discord.js").Message} Message
- * @typedef {import("discord.js").User}    User
+ * @typedef {import("discord.js").User}    DiscordUser
  * @typedef {import("discord.js").Channel} Channel
  *
  * @typedef {import("../database.js").ReputationData} ReputationData
@@ -45,7 +45,7 @@ export default class ReputationManager extends InteractionHandler {
 	 * message a point of rep.
 	 *
 	 * @param {MessageReaction} reaction - A reaction made on a message
-	 * @param {User}            user     - The user that reacted to the message
+	 * @param {DiscordUser}     user     - The user that reacted to the message
 	 * @return {Reputation|void}           Returns early if any other reaction, or the new Reputation database Model
 	 * @memberof ReputationManager
 	 */
@@ -124,9 +124,9 @@ export default class ReputationManager extends InteractionHandler {
 	/**
 	 * Handles giving reputation to a user mentioned in a message.
 	 *
-	 * @param {User}    user    - The user receiving the reputation
-	 * @param {Message} message - The message in which the user is being "thanked" or otherwise awarded rep
-	 * @param {boolean} reply   - If true, send the message as a reply to the triggering message
+	 * @param {DiscordUser} user    - The user receiving the reputation
+	 * @param {Message}     message - The message in which the user is being "thanked" or otherwise awarded rep
+	 * @param {boolean}     reply   - If true, send the message as a reply to the triggering message
 	 * @return {string}           The response message
 	 * @memberof ReputationManager
 	 */
@@ -283,20 +283,83 @@ export default class ReputationManager extends InteractionHandler {
 	 */
 	async scoreboardCommand(interaction, options) {
 		const message = `Reputation Scoreboard:`;
-		const scoreboard = await this.getScoreboardPage((options?.page - 1) * 10 || 0);
+		const page = options?.page || 1;
+		const scoreboard = await this.getScoreboardPage(page);
 
 		const response = await this.bot.respond(interaction, {
-			content: message,
+			//content: message,
 			embeds: [scoreboard]
 		});
 
-		
-		utils.debug(response);
-		utils.debug(message);
-		utils.debug(scoreboard.description);
-		utils.debug(interaction);
+		this.paginate(response, page, 100, true);
 		return response;
 	}
+
+	/**
+	 * Handles the left/right page control via reactions.
+	 *
+	 * @param {Message} response               - The message being watched
+	 * @param {number} [page=1]                - The current page number
+	 * @param {number} [last=Number.MAX_VALUE] - The highest allowed page number
+	 * @return {Promise<void>}
+	 * @memberof ReputationManager
+	 */
+	async paginate(response, page=1, last=Number.MAX_VALUE, first=false) {
+		if (first) { // On the first pagination, set the reactions
+			await response.react("◀");
+			await response.react("▶");
+		}
+
+		let user;
+		// Wait for someone to react with one of the ◀ or ▶ emoji
+		const reactions = await response.awaitReactions(
+			(reaction, usr) => { // On each reaction
+				user = usr; // Stash the user for later
+				// Check if the emoji is right
+				return !usr.bot && ["◀", "▶"].includes(reaction.emoji.name) 
+			},
+			// Only wat for 1, stop wating after 5 minutes
+			{ max: 1, time: 300000, errors: ['time'] }
+		);
+
+		// Take the first (of one) reaction
+		const reaction = reactions?.first();
+		// Make sure it exists
+		if (!reaction) return utils.debug("Scoreboard timed out or had an error.");
+
+		// Remove the reaction
+		reaction.users.remove(user.id);
+
+		// Turn the page
+		switch (reaction.emoji.name) {
+			case "◀": return this.turnPage(response, page, last, -1);
+			case "▶": return this.turnPage(response, page, last,  1);
+		}
+	}
+
+	/**
+	 * Loads a new page and replaces the embed, then calls a
+	 * new pagination.
+	 *
+	 * @param {Message} response  - The message being watched
+	 * @param {number}  page      - The current page number
+	 * @param {number}  last      - The highest allowed page number
+	 * @param {number}  direction - Number of pages to turn, posative or negative
+	 * @memberof ReputationManager
+	 */
+	async turnPage(response, page, last, direction) {
+		page += direction;
+
+		// Bounds checking
+		if (page < 1   ) page = 1;
+		if (page > last) page = last;
+
+		// Edit the original message embed
+		await response.edit({ embed: await this.getScoreboardPage(page) });
+		// Set up pagination again
+		this.paginate(response, page, last)
+	}
+
 
 	/**
 	 * Gets the formatted text embed for a particular scoreboard page.
@@ -306,19 +369,25 @@ export default class ReputationManager extends InteractionHandler {
 	 * @memberof ReputationManager
 	 */
 	async getScoreboardPage(page) {
+		const limit = this.config.points.scoreboardLength;
+		const offset = (page - 1) * limit;
+
+		console.time("Query");
 		const scores = await Score.findAll({
-			attributes: ["rank", "score", "user"],
+			attributes: ["rank", "score", "user", "tag"],
 			order: [["rank", "ASC"]],
-			offset: page,
-			limit: 10, raw: true
+			offset, limit, raw: true
 		})
+		console.timeEnd("Query");
 
+		console.time("Names");
 		for (let score of scores) {
-			let user = await this.client.users.fetch(score.user);
-			score.user = `${user?.username}#${user?.discriminator}`;
+			let user = await this.bot.fetchUserInfo(score.user);
+			score.user = user.tag;
 		}
+		console.timeEnd("Names");
 
-		return await this.getScoreboardEmbed(scores);
+		return await this.getScoreboardEmbed(scores, page);
 	}
 
 	/**
@@ -329,7 +398,7 @@ export default class ReputationManager extends InteractionHandler {
 	 * @return {object}               The embed data for the scoreboard embed
 	 * @memberof ReputationManager
 	 */
-	getScoreboardEmbed(scores) {
+	getScoreboardEmbed(scores, page) {
 		const board = scores.map((s, i) => ({
 			"- Rank -": `#${s.rank}`,
 			"- Points -": s.score,
@@ -344,10 +413,14 @@ export default class ReputationManager extends InteractionHandler {
 			}
 		});	
 
+		utils.debug("\n" + message + "\n");
+
 		return {
 			color: 0xff6400,
 			title: "Scoreboard",
-			description: "```\n" + message + "\n```"
+			description: "```\n" + message + "\n```",
+			footer: { text: `Page ${page}` },
+			timestamp: new Date(Date.now()).toISOString()
 		}
 	}
 
@@ -365,14 +438,14 @@ export default class ReputationManager extends InteractionHandler {
 	/**
 	 * Constructs a response string for when reputation is given.
 	 *
-	 * @param {object}       params             - An object of parameters
-	 * @param {number}      [params.amount]     - The number of points given (default: 1)
-	 * @param {User}        [params.sender]     - The user that gave the reputation
-	 * @param {User[]}       params.recipients  - The user(s) that received the reputaion
-	 * @param {Channel}     [params.channel]    - The channel in which the reputation was given
-	 * @param {Message}     [params.message]    - The message to which the reputation was given
-	 * @param {Score[]}     [params.scores]     - The current reputation stats for the recipient(s)
-	 * @param {string}      [params.giveReason] - A reason why the giver gave the receiver points
+	 * @param {object}        params             - An object of parameters
+	 * @param {number}       [params.amount]     - The number of points given (default: 1)
+	 * @param {DiscordUser}  [params.sender]     - The user that gave the reputation
+	 * @param {DiscordUser[]} params.recipients  - The user(s) that received the reputaion
+	 * @param {Channel}      [params.channel]    - The channel in which the reputation was given
+	 * @param {Message}      [params.message]    - The message to which the reputation was given
+	 * @param {Score[]}      [params.scores]     - The current reputation stats for the recipient(s)
+	 * @param {string}       [params.giveReason] - A reason why the giver gave the receiver points
 	 * @return {string}                           The message responding to the reputation giving event
 	 * @memberof ReputationManager
 	 */
@@ -392,8 +465,8 @@ export default class ReputationManager extends InteractionHandler {
 	 * Formats the mentions and stats for a list of 
 	 * recipients, and an optional list of corresponding scores.
 	 *
-	 * @param {User[]}    recipients - One or more Users who are receiving points
-	 * @param {Scorep[]} [scores]    - The scores of those users after gaining those points
+	 * @param {DiscordUser[]} recipients - One or more Users who are receiving points
+	 * @param {Scorep[]}     [scores]    - The scores of those users after gaining those points
 	 * @return {string} 
 	 * @memberof ReputationManager
 	 */
