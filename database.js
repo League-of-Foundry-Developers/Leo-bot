@@ -36,25 +36,30 @@ class View extends EnhancedModel {
 export class Score extends View {
 	static get createCode() {
 		return /* sql */`
-		SELECT 
+		SELECT
 			user,
+			name,
+			discriminator,
+			name || "#" || discriminator AS tag,
 			score,
 			latest,
 			initial,
 			rank() OVER (
+				ORDER BY
 					score DESC,
 					latest DESC
-			) AS rank 
+			) AS rank
 		FROM (
 			SELECT
 				user,
 				SUM(delta) AS score,
-				MAX(updatedAt) AS latest,
-				MIN(createdAt) AS initial
+				MAX(Reputation.updatedAt) AS latest,
+				MIN(Reputation.createdAt) AS initial
 			FROM
 				Reputation
 			GROUP BY user
-		);`
+		)
+		INNER JOIN Users ON user = Users.id;`
 	}
 	static get schema() {
 		return {
@@ -148,9 +153,10 @@ export class User extends EnhancedModel {
 	}
 	static get schema() {
 		return {
-			user: {
+			id: {
 				type: DataTypes.STRING,
-				allowNull: false
+				allowNull: false,
+				primaryKey: true
 			},
 			name: DataTypes.STRING,
 			discriminator: DataTypes.STRING
@@ -162,7 +168,7 @@ export class User extends EnhancedModel {
 			indexes: [
 				{
 					unique: true,
-					fields: ["user"]
+					fields: ["id"]
 				}
 			]
 		}
