@@ -394,16 +394,16 @@ export default class ReputationManager extends InteractionHandler {
 	 */
 	getScoreboardEmbed(scores, page) {
 		const board = scores.map((s, i) => ({
-			"- Rank -": `#${s.rank}`,
-			"- Points -": s.score,
-			"- User -": s.tag
+			" Rank ": `#${s.rank}`,
+			" Points ": s.score,
+			"-- User Tag --": s.tag
 		}));
 
 		const message = columnify(board, {
 			columnSplitter: " | ",
 			config: {
-				"- Rank -": { align: "center" },
-				"- Points -": { align: "right" }
+				" Rank ": { align: "center" },
+				" Points ": { align: "right" }
 			}
 		});	
 
