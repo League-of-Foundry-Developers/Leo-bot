@@ -73,10 +73,13 @@ export default class PackageSearch extends InteractionHandler {
 		const pkg = await Package.get(this, name, manifest);
 		
 		if (pkg.hasError) return this.handlePackageError(pkg);
+
+		const embed = this.packageEmbed(pkg);
+		utils.debug(embed);
 		
 		return {
 			content: `Package: \`${pkg.name}\``,
-			embeds: [this.packageEmbed(pkg)]
+			embeds: [embed]
 		}
 	}
 

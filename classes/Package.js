@@ -32,7 +32,7 @@ export default class Package {
 	 */
 	constructor(manager, name, manifest=null) {
 		this.manager = manager;
-		this._name = name;
+		this._name = name.trim();
 		if (manifest) {
 			this._manifestUrl = manifest;
 
@@ -90,7 +90,7 @@ export default class Package {
 			this.getFoundryHub()
 		]);
 
-		if (this.notFound) await this.searchPackages();
+		if (this.notFound) return await this.searchPackages();
 		else {
 			try { this.validateManifest(); }
 			catch (error) { console.error(error); }
@@ -112,7 +112,7 @@ export default class Package {
 	 */
 	async getBazaar() {
 		try {
-			const response = await fetch(`https://forge-vtt.com/api/bazaar/package/${this.name}?manifest=1`);
+			const response = await fetch(`https://forge-vtt.com/api/bazaar/package/${encodeURIComponent(this.name)}?manifest=1`);
 			
 			if (response.status != 200) // Not a suceess
 				throw new Error(`Could not fetch "${this.name}" from the Bazzar.\nStatus code: ${response.status}`);
@@ -146,7 +146,7 @@ export default class Package {
 	 */
 	async getFoundryHub() {
 		try {
-			const response = await fetch(`https://www.foundryvtt-hub.com/wp-json/hubapi/v1/package/${this.name}`);
+			const response = await fetch(`https://www.foundryvtt-hub.com/wp-json/hubapi/v1/package/${encodeURIComponent(this.name)}`);
 			
 			if (response.status != 200) // Not a suceess
 				throw new Error(`Could not fetch "${this.name}" from the Foundry Hub.\nStatus code: ${response.status}`);
@@ -214,7 +214,7 @@ export default class Package {
 	 */
 	async searchPackages() {
 		try {
-			const response = await fetch(`https://www.foundryvtt-hub.com/wp-json/relevanssi/v1/search?posts_per_page=5&paged=1&type=package&keyword=${this.name}`);
+			const response = await fetch(`https://www.foundryvtt-hub.com/wp-json/relevanssi/v1/search?posts_per_page=5&paged=1&type=package&keyword=${encodeURIComponent(this.name)}`);
 
 			if (response.status != 200) // Not a suceess
 				throw new Error(`Could not fetch search results for \`${this.name}\``);
@@ -225,6 +225,8 @@ export default class Package {
 				throw new Error(`No results found for query: "${this.name}"`)
 
 			this.searchResults = results.map(p => p.slug);
+
+			return this.checkResults();
 		}
 		catch (error) {
 			console.error(`There was an issue fetching search results for "${this.name}"`);
@@ -232,6 +234,39 @@ export default class Package {
 			this.errors.push("search");
 			this.searchResults = [];
 		}
+	}
+
+	/**
+	 * Determins if any of the search results are a "perfect"
+	 * match for the name. This means that they match all the
+	 * right letters if one disregards capitalization, spaces,
+	 * and common seperators between words.
+	 *
+	 * @return {Package} Either this package with the results (if no match), or a new package querried from a matching result.
+	 * @memberof Package
+	 */
+	async checkResults() {
+		const name   = this.stripName(this.name);
+		const result = this.searchResults
+			.find(result => this.stripName(result) == name);
+
+		if (result) return await Package.get(this.manager, result);
+		return this;
+	}
+
+	/**
+	 * Strips capital letters, seperators, and whitespace from a name.
+	 *
+	 * Seperators include: `-`, `_`, and `.`
+	 *
+	 * Used to normalize names for comparison.
+	 *
+	 * @param {string} name - The name being stripped
+	 * @return {string}       The name with no caps, spaces, or sperators.
+	 * @memberof Package
+	 */
+	stripName(name) {
+		return name.toLowerCase().replace(/\s|-|_|\./g, "");
 	}
 
 	/**
