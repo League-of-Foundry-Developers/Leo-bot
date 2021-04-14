@@ -224,29 +224,36 @@ export default class Leo {
 	}
 */
 	/**
-	 * Sends a response to an interaction
+	 * Sends a response to an interaction.
 	 *
-	 * @param {Interaction} interaction  - The interaction to respond to
-	 * @param {InteractionResponse} data - The response data
-	 * @return {Promise<Message>}          The message that was sent in response
+	 * Optionally returns the message that was sent in response tot he interaction.
+	 *
+	 * @param {Interaction}         interaction   - The interaction to respond to
+	 * @param {InteractionResponse} data          - The response data
+	 * @param {boolean}             awaitResponse - When true, the response message will be fetched and returned
+	 * @return {Promise<Message>|Promise<null>}     The message that was sent in response
 	 * @memberof Leo
 	 */
-	async respond(interaction, data) {
+	async respond(interaction, data, awaitResponse=false) {
 		this.cleanData(data);
 
 		// Send the response
 		await this.client.api.interactions(interaction.id, interaction.token)
 			.callback.post({ data: { type: 4, data: data } });
 
+		if (!awaitResponse) return null;
+
 		// Get the channel of the interaction
-		const channel = await this.client.channels.fetch(interaction.channel_id);
+		let channel = this.client.channels.fetch(interaction.channel_id);
 
 		// Fetch the response message by using PATCH on the special endpoint.
 		// This is not the "correct" way to do this, but the API is not mature yet.
 		// Nevertheless, this will return the message data.
-		const response = await this.client.api
+		let response = this.client.api
 			.webhooks(interaction.application_id, interaction.token, "messages", "@original")
 			.patch({ data: {} });
+
+		[channel, response] = await Promise.all([channel, response]);
 
 		// Construct a Discord.js Message object around the message data, and return
 		return new Message(this.client, response, channel);

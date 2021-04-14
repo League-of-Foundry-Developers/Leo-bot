@@ -287,14 +287,12 @@ export default class ReputationManager extends InteractionHandler {
 	 * @memberof ReputationManager
 	 */
 	async scoreboardCommand(interaction, options) {
-		const message = `Reputation Scoreboard:`;
 		const page = options?.page || 1;
 		const scoreboard = await this.getScoreboardPage(page);
 
 		const response = await this.bot.respond(interaction, {
-			//content: message,
 			embeds: [scoreboard]
-		});
+		}, true);
 
 		this.paginate(response, page, 100, true);
 		return response;
