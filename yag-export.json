@@ -8267,7 +8267,7 @@
 		"sender_id": "110951043700883456",
 		"receiver_id": "150209057268039680",
 		"set_fixed_amount": true,
-		"amount": 45,
+		"amount": 9,
 		"receiver_username": "",
 		"sender_username": ""
 	},
@@ -10720,7 +10720,7 @@
 		"sender_id": "110951043700883456",
 		"receiver_id": "82206419352289280",
 		"set_fixed_amount": true,
-		"amount": 44,
+		"amount": 5,
 		"receiver_username": "",
 		"sender_username": ""
 	},
@@ -16143,7 +16143,7 @@
 		"sender_id": "71699583889055744",
 		"receiver_id": "132919177529786368",
 		"set_fixed_amount": true,
-		"amount": 6,
+		"amount": -6,
 		"receiver_username": "",
 		"sender_username": ""
 	},
@@ -16165,7 +16165,7 @@
 		"sender_id": "71699583889055744",
 		"receiver_id": "132919177529786368",
 		"set_fixed_amount": true,
-		"amount": 11,
+		"amount": 10,
 		"receiver_username": "",
 		"sender_username": ""
 	},
@@ -19784,7 +19784,7 @@
 		"sender_id": "71699583889055744",
 		"receiver_id": "694699568486416485",
 		"set_fixed_amount": true,
-		"amount": 8,
+		"amount": 6,
 		"receiver_username": "",
 		"sender_username": ""
 	},
@@ -24497,94 +24497,6 @@
 		"sender_username": "Daren#8590"
 	},
 	{
-		"id": 20185611,
-		"created_at": "2021-02-28T23:23:22.381959Z",
-		"guild_id": "732325252788387980",
-		"sender_id": "132919177529786368",
-		"receiver_id": "204255221017214977",
-		"set_fixed_amount": false,
-		"amount": 1,
-		"receiver_username": "YAGPDB.xyz#8760",
-		"sender_username": "Blitz#6797"
-	},
-	{
-		"id": 17612703,
-		"created_at": "2021-01-16T10:54:26.272616Z",
-		"guild_id": "732325252788387980",
-		"sender_id": "132919177529786368",
-		"receiver_id": "204255221017214977",
-		"set_fixed_amount": false,
-		"amount": 1,
-		"receiver_username": "YAGPDB.xyz#8760",
-		"sender_username": "Blitz#6797"
-	},
-	{
-		"id": 17241397,
-		"created_at": "2021-01-08T17:37:26.747523Z",
-		"guild_id": "732325252788387980",
-		"sender_id": "398134675002097666",
-		"receiver_id": "204255221017214977",
-		"set_fixed_amount": false,
-		"amount": -1,
-		"receiver_username": "YAGPDB.xyz#8760",
-		"sender_username": "zeel#4200"
-	},
-	{
-		"id": 17241359,
-		"created_at": "2021-01-08T17:36:28.417214Z",
-		"guild_id": "732325252788387980",
-		"sender_id": "398134675002097666",
-		"receiver_id": "204255221017214977",
-		"set_fixed_amount": false,
-		"amount": -1,
-		"receiver_username": "YAGPDB.xyz#8760",
-		"sender_username": "zeel#4200"
-	},
-	{
-		"id": 17241330,
-		"created_at": "2021-01-08T17:35:57.938659Z",
-		"guild_id": "732325252788387980",
-		"sender_id": "184744164049682433",
-		"receiver_id": "204255221017214977",
-		"set_fixed_amount": false,
-		"amount": 1,
-		"receiver_username": "YAGPDB.xyz#8760",
-		"sender_username": "JDW#6422"
-	},
-	{
-		"id": 14769300,
-		"created_at": "2020-11-20T18:44:05.949832Z",
-		"guild_id": "732325252788387980",
-		"sender_id": "398134675002097666",
-		"receiver_id": "204255221017214977",
-		"set_fixed_amount": false,
-		"amount": -1,
-		"receiver_username": "YAGPDB.xyz#8760",
-		"sender_username": "zeel#4200"
-	},
-	{
-		"id": 14464918,
-		"created_at": "2020-11-14T20:29:21.704091Z",
-		"guild_id": "732325252788387980",
-		"sender_id": "398134675002097666",
-		"receiver_id": "204255221017214977",
-		"set_fixed_amount": false,
-		"amount": 1,
-		"receiver_username": "YAGPDB.xyz#8760",
-		"sender_username": "zeel#4200"
-	},
-	{
-		"id": 14069281,
-		"created_at": "2020-11-06T21:28:33.281505Z",
-		"guild_id": "732325252788387980",
-		"sender_id": "71699583889055744",
-		"receiver_id": "204255221017214977",
-		"set_fixed_amount": true,
-		"amount": 1,
-		"receiver_username": "",
-		"sender_username": ""
-	},
-	{
 		"id": 14043781,
 		"created_at": "2020-11-06T09:33:32.67028Z",
 		"guild_id": "732325252788387980",
@@ -27561,7 +27473,7 @@
 		"sender_id": "71699583889055744",
 		"receiver_id": "71699583889055744",
 		"set_fixed_amount": true,
-		"amount": -9982,
+		"amount": 1,
 		"receiver_username": "",
 		"sender_username": ""
 	},
@@ -27737,7 +27649,7 @@
 		"sender_id": "71699583889055744",
 		"receiver_id": "71699583889055744",
 		"set_fixed_amount": true,
-		"amount": -9996,
+		"amount": 1,
 		"receiver_username": "",
 		"sender_username": ""
 	},
@@ -27781,7 +27693,7 @@
 		"sender_id": "692454090910859335",
 		"receiver_id": "71699583889055744",
 		"set_fixed_amount": true,
-		"amount": -10000,
+		"amount": -20000,
 		"receiver_username": "",
 		"sender_username": ""
 	},
