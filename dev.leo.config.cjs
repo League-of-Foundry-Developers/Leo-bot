@@ -7,6 +7,7 @@ module.exports = {
 			node_args: "--inspect --trace-warnings --unhandled-rejections=strict",
 			watch: true,
 			ignore_watch: ["node_modules", "*.db*", "*.log*"],
+			watch_delay: 1000,
 			error_file: "dev.error.log",
 			out_file: "dev.leo.log",
 			restart_delay: "3000",

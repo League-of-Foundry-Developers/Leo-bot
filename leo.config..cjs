@@ -6,6 +6,7 @@ module.exports = {
 			args: "./config.json",
 			watch: true,
 			ignore_watch: ["node_modules", "*.db*", "*.log*"],
+			watch_delay: 1000,
 			error_file: "error.log",
 			out_file: "leo.log",
 			restart_delay: "3000",
