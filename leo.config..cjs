@@ -5,7 +5,7 @@ module.exports = {
 			script: "./main.js",
 			args: "./config.json",
 			watch: true,
-			ignore_watch: ["node_modules"],
+			ignore_watch: ["node_modules", "\.db"],
 			error_file: "error.log",
 			out_file: "leo.log",
 			restart_delay: "3000",
