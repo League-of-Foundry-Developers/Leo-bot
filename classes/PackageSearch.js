@@ -96,9 +96,9 @@ export default class PackageSearch extends InteractionHandler {
 	handlePackageError(pkg) {
 		utils.debug("Package errors!")
 
-		let /* Generic Error */   error = strings.packageError(pkg);
-		if  (pkg.manifestInvalid) error = strings.validationError(pkg);
-		if  (pkg.notFound)        error = strings.searchResults(pkg);
+		let /* Generic Error */                error = strings.packageError(pkg);
+		if  (pkg.manifestInvalid)              error = strings.validationError(pkg);
+		if  (pkg.notFound && !pkg.searchError) error = strings.searchResults(pkg);
 
 		utils.debug(error);
 

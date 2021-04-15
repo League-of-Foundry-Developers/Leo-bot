@@ -224,7 +224,7 @@ export default class Package {
 			if (!results || results?.code == "No results") // Insufficient data
 				throw new Error(`No results found for query: "${this.name}"`)
 
-			this.searchResults = results.map(p => p.slug);
+			this.searchResults = results;//.map(p => p.slug);
 
 			return this.checkResults();
 		}
@@ -233,6 +233,7 @@ export default class Package {
 			console.error(error);
 			this.errors.push("search");
 			this.searchResults = [];
+			return this;
 		}
 	}
 
@@ -246,11 +247,18 @@ export default class Package {
 	 * @memberof Package
 	 */
 	async checkResults() {
-		const name   = this.stripName(this.name);
-		const result = this.searchResults
-			.find(result => this.stripName(result) == name);
+		const results = this.searchResults;
+		const name    = this.stripName(this.name);
 
-		if (result) return await Package.get(this.manager, result);
+		const result = results
+			.find(result => this.stripName(result.slug) == name);
+
+		if (result) return await Package.get(this.manager, result.slug);
+
+		if (results[0].relevance_score > 300 &&
+			results[0].relevance_score > results[1].relevance_score * 2)
+			return await Package.get(this.manager, results[0].slug);
+
 		return this;
 	}
 

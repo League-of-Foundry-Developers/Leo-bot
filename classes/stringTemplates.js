@@ -63,7 +63,8 @@ return `\
  */
 static searchResults({ name, searchResults=[] }) {
 
-const items = searchResults.join("\n");
+const items = searchResults.map(p => p.slug).join("\n");
+
 return `\
 Could not find the pacakge \`${name}\`.${items ? `
 **Similar names:**
