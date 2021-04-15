@@ -66,7 +66,7 @@ static searchResults({ name, searchResults=[] }) {
 const items = searchResults.map(p => p.real_name).join("\n");
 
 return `\
-Could not find the pacakge \`${name}\`.${items ? `
+Could not find the package \`${name}\`.${items ? `
 **Similar names:**
 \`\`\`
 ${items}

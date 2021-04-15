@@ -108,7 +108,7 @@ export default class PackageSearch extends InteractionHandler {
 	/**
 	 * Build the package data embed.
 	 *
-	 * @param {Pacakge} pkg - The package data
+	 * @param {Package} pkg - The package data
 	 * @return {MessageEmbed}
 	 * @memberof PackageSearch
 	 */
