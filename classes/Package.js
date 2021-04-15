@@ -30,9 +30,10 @@ export default class Package {
 	 * @param {string} [manifest=null]                          - The URL of a manifest file on the internet
 	 * @memberof Package
 	 */
-	constructor(manager, name, manifest=null) {
+	constructor(manager, name, manifest=null, iteration=1) {
 		this.manager = manager;
 		this._name = name.trim();
+		this._iteration = iteration;
 		if (manifest) {
 			this._manifestUrl = manifest;
 
@@ -224,9 +225,9 @@ export default class Package {
 			if (!results || results?.code == "No results") // Insufficient data
 				throw new Error(`No results found for query: "${this.name}"`)
 
-			this.searchResults = results;//.map(p => p.slug);
+			this.searchResults = results;
 
-			return this.checkResults();
+			return this._iteration > 1 ? this : this.checkResults();
 		}
 		catch (error) {
 			console.error(`There was an issue fetching search results for "${this.name}"`);
@@ -251,13 +252,13 @@ export default class Package {
 		const name    = this.stripName(this.name);
 
 		const result = results
-			.find(result => this.stripName(result.slug) == name);
+			.find(result => this.stripName(result.real_name) == name);
 
-		if (result) return await Package.get(this.manager, result.slug);
+		if (result) return await Package.get(this.manager, result.real_name, null, this._iteration + 1);
 
 		if (results[0].relevance_score > 300 &&
 			results[0].relevance_score > results[1].relevance_score * 2)
-			return await Package.get(this.manager, results[0].slug);
+			return await Package.get(this.manager, results[0].real_name, null, this._iteration + 1);
 
 		return this;
 	}
