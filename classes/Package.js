@@ -339,9 +339,9 @@ export default class Package {
 	}
 	/** @type {string} A string of one or more authors, multiple are joined by a comma */
 	get author() {
-		if (this.badData || !this.manifest.authors?.map) return "";
+		if (this.badData) return "";
 		if (this.fromManifest) {
-			if (!this.manifest.authors) return this.manifest.author;
+			if (!this.manifest.authors?.map) return this.manifest.author;
 			return this.manifest.authors.map(author => author.name)?.join(", ");
 		}
 		else return this.bazaar.authors?.join(", ");
