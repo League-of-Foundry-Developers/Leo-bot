@@ -64,3 +64,7 @@ npm run leo-dev
 // Or
 node main.js ./some-other-file.json
 ```
+
+# pm2
+
+Included are three `leo.config.cjs` files which are pm2 ecosystem files.
