@@ -20,14 +20,17 @@
   "dependencies": {
     "@typhonjs-fvtt/validate-manifest": "^0.0.0",
     "@typhonjs-node-utils/better-ajv-errors": "^0.0.8",
+    "better-sqlite3": "^7.1.5",
     "columnify": "^1.5.4",
     "discord.js": "github:discordjs/discord.js#e848d25",
+    "handlebars": "^4.7.7",
     "node-fetch": "^2.6.1",
     "node-html-to-image": "^3.1.0",
-    "sequelize": "^6.6.2"
+    "puppeteer": "^3.0.0",
+    "sequelize": "^6.6.2",
+    "sqlite3": "^5.0.2"
   },
   "devDependencies": {
-    "sequelize-cli": "^6.2.0",
-    "sqlite3": "^5.0.2"
+    "sequelize-cli": "^6.2.0"
   }
 }
