@@ -312,7 +312,7 @@ export default class Leo {
 		if (!this.config.backup) return;
 
 		console.log("Starting Backup...");
-		console.time("Backup completed in:");
+		console.time("Backup completed in");
 		
 		const backupPath = 
 			// dir/prefix.date.db
@@ -329,7 +329,7 @@ export default class Leo {
 		}
 		finally {
 			db.close();
-			console.timeEnd("Backup completed in:");
+			console.timeEnd("Backup completed in");
 		}
 	}
 
