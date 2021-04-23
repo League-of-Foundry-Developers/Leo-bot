@@ -25,10 +25,13 @@ async function main() {
 		partials: ['MESSAGE', 'CHANNEL', 'REACTION'], // Get partial data structures for these
 		intents: Intents.NON_PRIVILEGED               // Leo wants to do anything that isn't "privileged"
 	});
-
-	// Roar! 🦁
+	
 	const leo = new Leo(config, sequelize, client);
 
+	["exit", "SIGINT", "SIGQUIT", "SIGTERM", "uncaughtException", "unhandledRejection"]
+		.forEach(ec => process.on(ec, leo.handleExit.bind(leo)));
+	
+	// Roar! 🦁
 	await leo.init();
 }
 
