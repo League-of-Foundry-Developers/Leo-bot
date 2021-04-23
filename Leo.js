@@ -298,6 +298,27 @@ export default class Leo {
 			});
 		});
 	}
+	/**
+	 * Runs whenever the process exits, closes the database connection
+	 * and logs Leo out of Discord (shows him as offline).
+	 *
+	 * @param {string} signal - The exit signal/code/error
+	 * @return {void} 
+	 * @memberof Leo
+	 */
+	handleExit(signal) {
+		if (this.exiting) return; // Don't run this more than once
+		else this.exiting = true;
+
+		console.log(`\nReceived ${signal}`);
+		console.log(`Disconnecting Leo!`);
+
+		this.client.destroy();
+		this.sql.close();
+
+		console.log("Bye! 🦁");
+		process.exit();
+	}
 }
 
 
