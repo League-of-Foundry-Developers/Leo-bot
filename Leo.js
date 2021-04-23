@@ -3,6 +3,7 @@ import { User } from "./database.js";
 import utils from "./utils.js";
 import PackageSearch from "./classes/PackageSearch.js";
 import ReputationManager from "./classes/ReputationManager.js";
+import Database from "better-sqlite3";
 
 const { Client, Message } = discord;
 
@@ -46,6 +47,8 @@ export default class Leo {
 	 * @memberof Leo
 	 */
 	async init() {
+		await this.makeBackup();
+
 		await User.init(this.sql);
 		await this.reputation.init();
 		await this.packages.init();
@@ -77,7 +80,7 @@ export default class Leo {
 	 * @memberof Leo
 	 */
 	async onReady() {
-		console.log("Leo ready!");
+		console.log("🦁 Leo ready!");
 	}
 
 	/**
@@ -298,6 +301,38 @@ export default class Leo {
 			});
 		});
 	}
+
+	/**
+	 * Create a backup of the database.
+	 *
+	 * @return {void} 
+	 * @memberof Leo
+	 */
+	async makeBackup() {
+		if (!this.config.backup) return;
+
+		console.log("Starting Backup...");
+		console.time("Backup completed in:");
+		
+		const backupPath = 
+			// dir/prefix.date.db
+			`${this.config.backup.dir}/${this.config.backup.prefix}.${new Date(Date.now()).toISOString()}.db`;
+
+		const db = new Database(this.config.database);
+		
+		try {
+			const backup = await db.backup(backupPath);
+			utils.debug("Backup Created: ", backupPath, backup);
+		}
+		catch (e) {
+			console.error(e);
+		}
+		finally {
+			db.close();
+			console.timeEnd("Backup completed in:");
+		}
+	}
+
 	/**
 	 * Runs whenever the process exits, closes the database connection
 	 * and logs Leo out of Discord (shows him as offline).
