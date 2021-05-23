@@ -111,7 +111,6 @@ export default class ReputationManager extends InteractionHandler {
 	 * Determin if a message contains one of the triggers for giving reputation.
 	 *
 	 * @param {Message} message - A message to test
-	 
 	 * @return {boolean}          True if the message contains one of the triggers
 	 * @memberof ReputationManager
 	 */
