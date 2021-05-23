@@ -111,14 +111,16 @@ export default class ReputationManager extends InteractionHandler {
 	 * Determin if a message contains one of the triggers for giving reputation.
 	 *
 	 * @param {Message} message - A message to test
+	 
 	 * @return {boolean}          True if the message contains one of the triggers
 	 * @memberof ReputationManager
 	 */
 	_testMessage(message) {
 		return [
-			m => /(?<![A-z])thanks?(?![A-z])/gi.test(m.content),               // Contains "thank"
+			m => /(?<!no )(?<![A-z])thanks?(?![A-z])/gi.test(m.content),       // Contains "thank", but not preceeded by "no"
 			m => /(?<![A-z])tyvm(?![A-z])/gi.test(m.content),                  // Constains "tyvm"
 			m => /(?<![A-z])points? (?:to|for) <@(?![A-z])/gi.test(m.content), // Phrase like "a point to [user]" - think Harry Potter
+			m => /(?<![A-z])cheers(?![A-z])/gi.test(m.content),                // Constains "cheers"
 			m => /:vote:/gi.test(m.content)                                    // The +1 emoji
 		].some(test=> test(message));
 	}
