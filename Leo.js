@@ -237,12 +237,12 @@ export default class Leo {
 	 * @return {Promise<Message>|Promise<null>}     The message that was sent in response
 	 * @memberof Leo
 	 */
-	async respond(interaction, data, awaitResponse=false) {
+	async respond(interaction, data, awaitResponse=false, update=false) {
 		this.cleanData(data);
 
 		// Send the response
 		await this.client.api.interactions(interaction.id, interaction.token)
-			.callback.post({ data: { type: 4, data: data } });
+			.callback.post({ data: { type: update ? 7 : 4, data: data } });
 
 		if (!awaitResponse) return null;
 
