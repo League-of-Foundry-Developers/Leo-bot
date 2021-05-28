@@ -297,23 +297,31 @@ export default class ReputationManager extends InteractionHandler {
 	 * @memberof ReputationManager
 	 */
 	getPaginationComponents(page) {
-		const components = [];
-
-		components.push({
-			type: 2, // Button
-			label: page > 1 ? "◀" : "🔁",
-			style: 2,
-			custom_id: JSON.stringify({ name: "page", page: page > 1 ? page - 1 : 1 })
-		});
-
-		if (page < this.maxPage) components.push({
-			type: 2, // Button
-			label: "▶",
-			style: 2,
-			custom_id: JSON.stringify({ name: "page", page: page + 1 })
-		});
-
-		return [{ type: 1, components }]; // Type 1: ActionRow
+		return [{ 
+			type: 1, // Type 1: ActionRow
+			components: [
+				{
+					type: 2, // Button
+					label: "◀",
+					style: 1,
+					custom_id: JSON.stringify({ name: "page", page: page - 1 }),
+					disabled: page < 2
+				},
+				{
+					type: 2, // Button
+					label: "⟳",
+					style: 2,
+					custom_id: JSON.stringify({ name: "page", page: page })
+				},
+				{
+					type: 2, // Button
+					label: "▶",
+					style: 1,
+					custom_id: JSON.stringify({ name: "page", page: page + 1 }),
+					disabled: page >= this.maxPage
+				}
+			]
+		}];
 	}
 
 	/**
