@@ -128,12 +128,12 @@ export default class ReputationManager extends InteractionHandler {
 	 *
 	 * @param {DiscordUser} user    - The user receiving the reputation
 	 * @param {Message}     message - The message in which the user is being "thanked" or otherwise awarded rep
-	 * @return {string}           The response message
+	 * @return {string}               The response message
 	 * @memberof ReputationManager
 	 */
 	async _giveMessageRep(user, message) {
 		this.bot.updateUser(user.id, user);
-
+		
 		const rep = await this.giveRep({
 			user: user.id,
 			delta: 1,

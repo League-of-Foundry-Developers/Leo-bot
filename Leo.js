@@ -29,7 +29,7 @@ export default class Leo {
 	 * @param {Client}    client - A reference to the Discord.js client
 	 * @memberof Leo
 	 */
-	constructor(config, sql, client) {
+	constructor(config, sql, client, puppeteer) {
 		/** @type {LeoConfig} */
 		this.config = config;
 		/** @type {Sequelize} */
@@ -39,6 +39,7 @@ export default class Leo {
 
 		this.reputation = new ReputationManager(this);
 		this.packages   = new PackageSearch(this);
+		this._puppeteer = puppeteer;
 	}
 	
 	/**
@@ -53,6 +54,10 @@ export default class Leo {
 		await this.reputation.init();
 		await this.packages.init();
 		await this.createListeners();
+
+		this.puppeteer  = await this._puppeteer.launch();
+		this.puppetPage = await this.puppeteer.newPage();
+
 		await this.client.login(this.config.token);
 	}
 
@@ -260,6 +265,17 @@ export default class Leo {
 
 		// Construct a Discord.js Message object around the message data, and return
 		return new Message(this.client, response, channel);
+	}
+
+	async defer(interaction) {
+		return await this.client.api.interactions(interaction.id, interaction.token)
+			.callback.post({ data: { type: 5, data: { content: "Waiting..."} }});
+	}
+	async update(interaction, data) {
+		await this.client.api
+			.webhooks(interaction.application_id, interaction.token, "messages", "@original")
+			.patch({ data: data.data, files: data.files });
+		console.debug("Patch Complete")
 	}
 
 	/**

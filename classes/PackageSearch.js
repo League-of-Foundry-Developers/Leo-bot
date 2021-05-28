@@ -2,6 +2,11 @@ import utils from "../utils.js";
 import InteractionHandler from "./InteractionHandler.js";
 import Package from "./Package.js";
 import strings from "./stringTemplates.js";
+import nodeHtmlToImage from "node-html-to-image";
+import puppeteer from "puppeteer";
+import Handlebars from "handlebars";
+import fs from "fs/promises";
+
 
 /**
  * @typedef {import("discord.js").MessageEmbed} MessageEmbed
@@ -27,6 +32,8 @@ export default class PackageSearch extends InteractionHandler {
 		/** @type {Object<string, function>} A set of manifest validation functions */
 		this.validator = await import("@typhonjs-fvtt/validate-manifest");
 		this.betterErrors = (await import("@typhonjs-node-utils/better-ajv-errors")).default;
+		const template = await fs.readFile("./cardTemplate.hbs", "utf8");
+		this.cardTemplate = Handlebars.compile(template);
 	}
 
 	/**
@@ -51,7 +58,10 @@ export default class PackageSearch extends InteractionHandler {
 	 */
 	async command(interaction, options) {
 		utils.debug(options);
-		return await this.bot.respond(
+
+		await this.bot.defer(interaction);
+
+		return await this.bot.update(
 			interaction, 
 			await this.getPackageResponse(
 				options.name,
@@ -76,11 +86,29 @@ export default class PackageSearch extends InteractionHandler {
 
 		const embed = this.packageEmbed(pkg);
 		utils.debug(embed);
+
+		const image = await this.getImage(name, pkg);
 		
-		return {
+		embed.image.url = "attachment://image.png";
+		return {data:{
 			content: `Package: \`${pkg.name}\``,
 			embeds: [embed]
-		}
+		}, files: [{
+			file: image,
+			name: "image.png"	
+		}]};
+	}
+	async getImage(name, pkg) {
+		const template = await fs.readFile("./cardTemplate.hbs", "utf8");
+		const cardTemplate = Handlebars.compile(template);
+
+		const width = 600, height = 350;
+		pkg.cardWidth = width; pkg.cardHeight = height;
+
+		await this.bot.puppetPage.setContent(cardTemplate(pkg, { allowProtoPropertiesByDefault: true }));
+		return await this.bot.puppetPage.screenshot({
+			clip: { x: 0, y: 0, width, height }
+		}); 
 	}
 
 	/**

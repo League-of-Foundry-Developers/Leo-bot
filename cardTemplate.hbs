@@ -1,0 +1,63 @@
+<html>
+	<head>
+		<style type="text/css">
+			* {	margin: 0; padding: 0; }
+			body { 
+				padding: 0;
+				font-size: 16px;
+				color: #ddd;
+			}
+			.card {
+				width: {{cardWidth}}px;
+				height: {{cardHeight}}px;
+			}
+			.card {
+				background-color: #1b1a1a;
+				padding: 1em;
+				display: grid;
+				grid-template-columns: 1fr;
+				grid-template-rows: repeat(9, auto);
+			}
+			.cover {
+				grid-column: 1 / -1;
+				grid-row: 1 / -1;
+				object-fit: cover;
+			}
+			.stats {
+				display: flex;
+			}
+			.stats li {
+				display: flex;
+				margin-right: 3ch;
+				font-weight: bold;
+			}
+		</style>
+	</head>
+	<body>
+		<main class="card">
+			<img class="cover" src="{{image}}">
+			<h4><code>{{name}}</code></h4>
+			<h1>{{title}}</h1>
+			<h2>{{author}}</h2>
+			<img src="{{thumb}}" width="64">
+			<h3 class="version">{{version}}</h3>
+			<h3 class="core-version">{{compatibleCoreVersion}}</h3>
+			<h4>{{systems}}</h4>
+			<p>{{{description}}}</p>
+			<ul class="stats">
+				<li>
+					<label>Installs:&nbsp;</label>
+					{{installs}}%
+				</li>
+				<li>
+					<label>Endorsements:&nbsp;</label>
+					{{endorsements}}
+				</li>
+				<li>
+					<label>Comments:&nbsp;</label>
+					{{comments}}
+				</li>
+			</ul>
+		</main>
+	</body>
+</html>

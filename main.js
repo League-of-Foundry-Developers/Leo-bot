@@ -2,6 +2,7 @@ import config from "./config.cjs";
 
 import discord from "discord.js";
 import seq from 'sequelize';
+import puppeteer from 'puppeteer';
 
 import utils from "./utils.js";
 import Leo from "./Leo.js";
@@ -26,7 +27,7 @@ async function main() {
 		intents: Intents.NON_PRIVILEGED               // Leo wants to do anything that isn't "privileged"
 	});
 	
-	const leo = new Leo(config, sequelize, client);
+	const leo = new Leo(config, sequelize, client, puppeteer);
 
 	["exit", "SIGINT", "SIGQUIT", "SIGTERM", "uncaughtException", "unhandledRejection"]
 		.forEach(ec => process.on(ec, leo.handleExit.bind(leo)));

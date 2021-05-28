@@ -1,8 +1,29 @@
-import nodeHtmlToImage from 'node-html-to-image'
+import puppeteer from 'puppeteer';
 
-nodeHtmlToImage({
-	output: './image.png',
-	html: '<html><body>Hello {{name}}!</body></html>',
-	content: { name: 'you' }
-})
-.then(() => console.log('The image was created successfully!'))
+(async () => {
+	console.time("Launch");
+	const browser = await puppeteer.launch();
+	console.timeEnd("Launch");
+
+	console.time("New Page");
+	const page = await browser.newPage();
+	console.timeEnd("New Page");
+
+	const content = "Hello World!";
+
+	console.time("Render");
+	await page.setContent(`
+	<DOCTYPE html>
+	<head></head>
+	<body>
+		<h1>${content}</h1>
+	</body>
+	`);
+	console.timeEnd("Render");
+	
+	console.time("Screenshot");
+	await page.screenshot({ path: "example.png" });
+	console.timeEnd("Screenshot");
+
+	await browser.close();
+})();
