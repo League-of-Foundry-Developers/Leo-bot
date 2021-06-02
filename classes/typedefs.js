@@ -12,6 +12,9 @@
  * @property {object}  emotes.plusone            - A group of settigns regarding the +1 emote
  * @property {string}  emotes.plusone.id         - The Discord snowflake id of the +1 emote
  * @property {string}  emotes.plusone.name       - The :name: of the +1 emote
+ * @property {object}  emotes.greeting           - A group of settigns regarding the greeting emote
+ * @property {string}  emotes.greeting.id        - The Discord snowflake id of the greeting emote
+ * @property {string}  emotes.greeting.name      - The :name: of the greeting emote
  * @property {object}  points                    - A group of settings regarding points
  * @property {string}  points.name               - The display name of points
  * @property {string}  points.scoreboardLength   - How many names per page of the scoreboard to display
@@ -20,6 +23,9 @@
  * @property {string}  permissions.giveMany      - The id of a role that can give more than one point
  * @property {number}  permissions.giveManyLimit - The give limit of the previous group
  * @property {string}  permissions.giveUnlimited - The id of a role which has no give restrictions
+ * @property {object}  backup                    - A group of settings for running backups
+ * @property {string}  backup.dir                - The durectory to store backups in (must exist!)
+ * @property {string}  backup.prefix             - A backup filename prefix
  * @property {boolean} debug                     - Whether or not debugging mode is enabled
  */
 

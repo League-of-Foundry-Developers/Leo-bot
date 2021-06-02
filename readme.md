@@ -18,6 +18,10 @@ This allows you to configure seperate settings for an in-developement environmen
 		"plusone": {
 			"id": "<emote id for +1>",
 			"name": "<name>"
+		},
+		"greeting": {
+			"id": "<emote id for greeting>",
+			"name": "<name>"
 		}
 	},
 	"points": {
@@ -30,9 +34,14 @@ This allows you to configure seperate settings for an in-developement environmen
 		"giveManyLimit": 5,
 		"giveUnlimited": "<role id>"
 	},
+	"backup": {
+		"dir": "./backups",
+		"prefix": "leo"
+	},
 	"debug": true
 }
 ```
+See config schema in `classes/typedefs.js`.
 # Running This Bot
 After running `npm install` to install dependencies, you must run:
 ```
