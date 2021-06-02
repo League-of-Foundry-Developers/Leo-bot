@@ -123,6 +123,7 @@ export default class ReputationManager extends InteractionHandler {
 			m => /(?<![A-z])tyvm(?![A-z])/gi.test(m.content),                  // Constains "tyvm"
 			m => /(?<![A-z])points? (?:to|for) <@(?![A-z])/gi.test(m.content), // Phrase like "a point to [user]" - think Harry Potter
 			m => /(?<![A-z])cheers(?![A-z])/gi.test(m.content),                // Constains "cheers"
+			m => /(?<![A-z])dankee?(?![A-z])/gi.test(m.content),               // Constains "danke"
 			m => /:vote:/gi.test(m.content)                                    // The +1 emoji
 		].some(test=> test(message));
 	}
