@@ -15,6 +15,8 @@
  * @property {object}  emotes.greeting           - A group of settigns regarding the greeting emote
  * @property {string}  emotes.greeting.id        - The Discord snowflake id of the greeting emote
  * @property {string}  emotes.greeting.name      - The :name: of the greeting emote
+ * @property {number}  emotes.greeting.delay     - The delay in ms before the random interval before the bot greets
+ * @property {number}  emotes.greeting.random    - The multiplier for the random number of additional ms of delay (this * Math.random())
  * @property {object}  points                    - A group of settings regarding points
  * @property {string}  points.name               - The display name of points
  * @property {string}  points.scoreboardLength   - How many names per page of the scoreboard to display

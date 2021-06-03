@@ -21,7 +21,9 @@ This allows you to configure seperate settings for an in-developement environmen
 		},
 		"greeting": {
 			"id": "<emote id for greeting>",
-			"name": "<name>"
+			"name": "<name>",
+			"delay": 180000,
+			"random": 100000
 		}
 	},
 	"points": {

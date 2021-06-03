@@ -35,7 +35,7 @@ export default class Greeter {
 
 		const reactions = await message.awaitReactions(
 			reaction => reaction.emoji.name == this.reaction.name,
-			{ time: (Math.random() * 100000) + 30000 }
+			{ time: (Math.random() * this.reaction.random) + this.reaction.delay }
 		)
 
 		utils.debug(reactions);
