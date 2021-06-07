@@ -119,7 +119,7 @@ export default class ReputationManager extends InteractionHandler {
 	 */
 	_testMessage(message) {
 		return [
-			m => /(?<!no )(?<![A-z])th(a?n?(k|x))?s?(?![A-z])/gi.test(m.content),   // Contains any of the permutations or abbreviations of thanks, but not preceeded by "no"
+			m => /(?<!no )(?<![A-z])th(a?n(k|x(?!s))s?)(?![A-z])/gi.test(m.content),   // Contains any of the permutations or abbreviations of thanks, but not preceeded by "no"
 			m => /(?<![A-z])ty(vm)?(?![A-z])/gi.test(m.content),                	// Constains "tyvm" or just "ty"
 			m => /(?<![A-z])points? (?:to|for) <@(?![A-z])/gi.test(m.content), 		// Phrase like "a point to [user]" - think Harry Potter
 			m => /(?<![A-z])cheers(?![A-z])/gi.test(m.content),                		// Constains "cheers"
