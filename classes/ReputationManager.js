@@ -84,8 +84,10 @@ export default class ReputationManager extends InteractionHandler {
 	 * @memberof ReputationManager
 	 */
 	async handleMessage(message) {
-		// Stop if there are no mentions. Test the message for triggers.
-		if (!message.mentions.users.size || !this._testMessage(message)) return;
+		if ( message.author.bot          || // Skip if the sender is a bot.
+			!message.mentions.users.size || // Stop if there are no mentions. 
+			!this._testMessage(message)     // Test the message for triggers.
+		) return;
 
 		// Convert users to an array, and remove any mentions that are the author
 		const users = [...message.mentions.users.values()]
