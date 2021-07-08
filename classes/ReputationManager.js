@@ -26,6 +26,9 @@ export default class ReputationManager extends InteractionHandler {
 	/** @readonly @override */
 	get commandName() { return "rep"; }
 
+	/** @readonly @override */
+	get componentNames() { return ["page"]; }
+
 	/** @type {object} Message options to disable pings @readonly  */
 	get noPing() { return { "allowedMentions": { "parse": [], "repliedUser": false } }; }
 
@@ -81,8 +84,10 @@ export default class ReputationManager extends InteractionHandler {
 	 * @memberof ReputationManager
 	 */
 	async handleMessage(message) {
-		// Stop if there are no mentions. Test the message for triggers.
-		if (!message.mentions.users.size || !this._testMessage(message)) return;
+		if ( message.author.bot          || // Skip if the sender is a bot.
+			!message.mentions.users.size || // Stop if there are no mentions. 
+			!this._testMessage(message)     // Test the message for triggers.
+		) return;
 
 		// Convert users to an array, and remove any mentions that are the author
 		const users = [...message.mentions.users.values()]
@@ -116,10 +121,12 @@ export default class ReputationManager extends InteractionHandler {
 	 */
 	_testMessage(message) {
 		return [
-			m => /(?<![A-z])thanks?(?![A-z])/gi.test(m.content),               // Contains "thank"
-			m => /(?<![A-z])tyvm(?![A-z])/gi.test(m.content),                  // Constains "tyvm"
-			m => /(?<![A-z])points? (?:to|for) <@(?![A-z])/gi.test(m.content), // Phrase like "a point to [user]" - think Harry Potter
-			m => /:vote:/gi.test(m.content)                                    // The +1 emoji
+			m => /(?<!no )(?<![A-z])th(a?n(k|x(?!s))s?)(?![A-z])/gi.test(m.content),   // Contains any of the permutations or abbreviations of thanks, but not preceeded by "no"
+			m => /(?<![A-z])ty(vm)?(?![A-z])/gi.test(m.content),                       // Constains "tyvm" or just "ty"
+			m => /(?<![A-z])points? (?:to|for) <@(?![A-z])/gi.test(m.content),         // Phrase like "a point to [user]" - think Harry Potter
+			m => /(?<![A-z])cheers(?![A-z])/gi.test(m.content),                        // Constains "cheers"
+			m => /(?<![A-z])dankee?(?![A-z])/gi.test(m.content),                       // Constains "danke"
+			m => /:vote:/gi.test(m.content)                                            // The +1 emoji
 		].some(test=> test(message));
 	}
 
@@ -276,6 +283,51 @@ export default class ReputationManager extends InteractionHandler {
 	}
 
 	/**
+	 * Arbitrary for now.
+	 *
+	 * TODO: Real max page checking
+	 *
+	 * @readonly
+	 * @memberof ReputationManager
+	 */
+	get maxPage() { return 100; }
+
+	/**
+	 * Constructs the data for the next/prev page components
+	 *
+	 * @param {number} page - The current page number
+	 * @return {*} 
+	 * @memberof ReputationManager
+	 */
+	getPaginationComponents(page) {
+		return [{ 
+			type: 1, // Type 1: ActionRow
+			components: [
+				{
+					type: 2, // Button
+					label: "◀",
+					style: 1,
+					custom_id: JSON.stringify({ name: "page", page: page - 1 }),
+					disabled: page < 2
+				},
+				{
+					type: 2, // Button
+					label: "⟳",
+					style: 2,
+					custom_id: JSON.stringify({ name: "page", page: page })
+				},
+				{
+					type: 2, // Button
+					label: "▶",
+					style: 1,
+					custom_id: JSON.stringify({ name: "page", page: page + 1 }),
+					disabled: page >= this.maxPage
+				}
+			]
+		}];
+	}
+
+	/**
 	 * Handles the `/rep scoreboard` command.
 	 *
 	 * Produces an embed with a scoreboard table, optionally displaying
@@ -288,81 +340,36 @@ export default class ReputationManager extends InteractionHandler {
 	 */
 	async scoreboardCommand(interaction, options) {
 		const page = options?.page || 1;
-		const scoreboard = await this.getScoreboardPage(page);
-
-		const response = await this.bot.respond(interaction, {
-			embeds: [scoreboard]
-		}, true);
-
-		this.paginate(response, page, 100, true);
-		return response;
+		return await this.displayPage(interaction, page);
+	}
+	
+	/**
+	 * Updates the scoreboard page when the page changing button is pressed.
+	 *
+	 * @param {Interaction} interaction - Information about the interaction
+	 * @param {*} data        - A set of data passed from the component
+	 * @return {*} 
+	 * @memberof ReputationManager
+	 */
+	async pageComponent(interaction, data) {
+		return await this.displayPage(interaction, data.page, true);
 	}
 
 	/**
-	 * Handles the left/right page control via reactions.
+	 * Responds to or updates the interaction with a scoreboard page.
 	 *
-	 * @param {Message} response               - The message being watched
-	 * @param {number} [page=1]                - The current page number
-	 * @param {number} [last=Number.MAX_VALUE] - The highest allowed page number
-	 * @return {Promise<void>}
+	 * @param {Interaction} interaction    - Information about the interaction
+	 * @param {number}      page           - The page number to display
+	 * @param {boolean}     [update=false] - Whether or not this is an update to an existing interaction
+	 * @return {*} 
 	 * @memberof ReputationManager
 	 */
-	async paginate(response, page=1, last=Number.MAX_VALUE, first=false) {
-		if (first) { // On the first pagination, set the reactions
-			await response.react("◀");
-			await response.react("▶");
-		}
-
-		let user;
-		// Wait for someone to react with one of the ◀ or ▶ emoji
-		const reactions = await response.awaitReactions(
-			(reaction, usr) => { // On each reaction
-				user = usr; // Stash the user for later
-				// Check if the emoji is right
-				return !usr.bot && ["◀", "▶"].includes(reaction.emoji.name) 
-			},
-			// Only wat for 1, stop wating after 5 minutes
-			{ max: 1, time: 300000 }
-		);
-
-		// Take the first (of one) reaction
-		const reaction = reactions?.first();
-		// Make sure it exists
-		if (!reaction) return utils.debug("Scoreboard timed out or had an error.");
-
-		// Remove the reaction
-		reaction.users.remove(user.id);
-
-		// Turn the page
-		switch (reaction.emoji.name) {
-			case "◀": return this.turnPage(response, page, last, -1);
-			case "▶": return this.turnPage(response, page, last,  1);
-		}
+	async displayPage(interaction, page, update=false) {
+		return await this.bot.respond(interaction, {
+			embeds: [await this.getScoreboardPage(page)],
+			components: this.getPaginationComponents(page)
+		}, false, update);
 	}
-
-	/**
-	 * Loads a new page and replaces the embed, then calls a
-	 * new pagination.
-	 *
-	 * @param {Message} response  - The message being watched
-	 * @param {number}  page      - The current page number
-	 * @param {number}  last      - The highest allowed page number
-	 * @param {number}  direction - Number of pages to turn, posative or negative
-	 * @memberof ReputationManager
-	 */
-	async turnPage(response, page, last, direction) {
-		page += direction;
-
-		// Bounds checking
-		if (page < 1   ) page = 1;
-		if (page > last) page = last;
-
-		// Edit the original message embed
-		await response.edit({ embed: await this.getScoreboardPage(page) });
-		// Set up pagination again
-		this.paginate(response, page, last)
-	}
-
 
 	/**
 	 * Gets the formatted text embed for a particular scoreboard page.

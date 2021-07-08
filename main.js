@@ -24,7 +24,7 @@ async function main() {
 
 	const client = new Client({
 		partials: ['MESSAGE', 'CHANNEL', 'REACTION'], // Get partial data structures for these
-		intents: Intents.NON_PRIVILEGED               // Leo wants to do anything that isn't "privileged"
+		intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "GUILD_MESSAGE_TYPING"]
 	});
 	
 	const leo = new Leo(config, sequelize, client, puppeteer);

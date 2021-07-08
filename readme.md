@@ -1,3 +1,4 @@
+![Leo The League Lion](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FLeague-of-Foundry-Developers%2Fleague-repo-status%2Fshields-endpoint%2FLeo-bot.json)
 # Configuration
 Leo is configured with a `config.json` file, or with a `test.config.json` or `dev.config.json` file. The `npm run` commands will use one of these config files as is approperiate.
 
@@ -18,6 +19,12 @@ This allows you to configure seperate settings for an in-developement environmen
 		"plusone": {
 			"id": "<emote id for +1>",
 			"name": "<name>"
+		},
+		"greeting": {
+			"id": "<emote id for greeting>",
+			"name": "<name>",
+			"delay": 180000,
+			"random": 100000
 		}
 	},
 	"points": {
@@ -30,9 +37,14 @@ This allows you to configure seperate settings for an in-developement environmen
 		"giveManyLimit": 5,
 		"giveUnlimited": "<role id>"
 	},
+	"backup": {
+		"dir": "./backups",
+		"prefix": "leo"
+	},
 	"debug": true
 }
 ```
+See config schema in `classes/typedefs.js`.
 # Running This Bot
 After running `npm install` to install dependencies, you must run:
 ```

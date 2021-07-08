@@ -3,6 +3,8 @@
  * @typedef {import("sequelize").Sequelize} Sequelize
  */
 
+import Utils from "../utils.js";
+
 /**
  * An abstract class for mechanisms that handle Discord interaction
  * /slash commands and delegate subcommands to specific moethods.
@@ -54,6 +56,24 @@ export default class InteractionHandler {
 	 */
 	get commandName() { return ""; }
 
+	get componentNames() { return []; }
+
+	/**
+	 * Handles interactions for an application.
+	 *
+	 * Delegates the interaction to a command or message component handler.
+	 *
+	 * @param {Interaction} interaction - Information about the interaction
+	 * @return {Promise<object>}          The response object
+	 * @memberof ReputationManager
+	 */
+	async handleInteraction(interaction) {
+		switch(interaction.type) {
+			case 1: return Utils.debug("Received Ping");
+			case 2: return await this.handleApplicationCommand(interaction);
+			case 3: return await this.handleMessageComponent(interaction);
+		}
+	}
 	/**
 	 * Handles /slash command interactions for a command.
 	 *
@@ -62,11 +82,11 @@ export default class InteractionHandler {
 	 *
 	 * If no subcommands are used, delegates handling to {@see this#command}
 	 *
-	 * @param {Interaction} interaction - Information about the interaction
-	 * @return {Promise<object>}          The response object
-	 * @memberof ReputationManager
+	 * @param {*} interaction
+	 * @return {*} 
+	 * @memberof InteractionHandler
 	 */
-	async handleInteraction(interaction) {
+	async handleApplicationCommand(interaction) {
 		if (interaction.data.name != this.commandName) return;
 
 		const sub = interaction.data.options.find(o => o.type == 1);
@@ -81,5 +101,22 @@ export default class InteractionHandler {
 			interaction,
 			InteractionHandler.extractOptions(sub)
 		);
+	}
+
+	/**
+	 * Handles message componenet interactions, delegating the
+	 * handling to a method that matches the custom_id of the
+	 * component.
+	 *
+	 * @param {*} interaction
+	 * @return {*} 
+	 * @memberof InteractionHandler
+	 */
+	async handleMessageComponent(interaction) {
+		const data = JSON.parse(interaction.data.custom_id);
+		if (!this.componentNames.includes(data.name)) return;
+
+		const handler = `${data.name}Component`;
+		if (this[handler]) return await this[handler](interaction, data);
 	}
 }

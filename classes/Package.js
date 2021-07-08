@@ -257,7 +257,7 @@ export default class Package {
 		if (result) return await Package.get(this.manager, result.real_name, null, this._iteration + 1);
 
 		if (results[0].relevance_score > 300 &&
-			results[0].relevance_score > results[1].relevance_score * 2)
+			results[0].relevance_score > results[1]?.relevance_score * 2)
 			return await Package.get(this.manager, results[0].real_name, null, this._iteration + 1);
 
 		return this;

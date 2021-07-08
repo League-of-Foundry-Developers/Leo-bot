@@ -3,6 +3,7 @@ import { User } from "./database.js";
 import utils from "./utils.js";
 import PackageSearch from "./classes/PackageSearch.js";
 import ReputationManager from "./classes/ReputationManager.js";
+import Greeter from "./classes/Greeter.js";
 import Database from "better-sqlite3";
 
 const { Client, Message } = discord;
@@ -40,6 +41,7 @@ export default class Leo {
 		this.reputation = new ReputationManager(this);
 		this.packages   = new PackageSearch(this);
 		this._puppeteer = puppeteer;
+		this.greeter    = new Greeter(this);
 	}
 	
 	/**
@@ -100,12 +102,13 @@ export default class Leo {
 	 * @memberof Leo
 	 */
 	async onMessage(message) {
-		if (message.author.bot) return;
+	//	if (message.author.bot) return;
 		utils.debug(message);
 		
 		try {
 			await Promise.all([
-				this.reputation.handleMessage(message)
+				this.reputation.handleMessage(message),
+				this.greeter.handleMessage(message)
 			]);
 		} catch (e) { console.error(e); }
 	}
@@ -157,6 +160,7 @@ export default class Leo {
 		this.client.once("ready", this.onReady.bind(this));
 		this.client.on("message", this.onMessage.bind(this));
 		this.client.on("messageReactionAdd", this.onMessageReactionAdd.bind(this));
+	//	this.client.on("guildMemberAdd", this.greeter.handleMessage.bind(this.greeter));
 
 		this.client.ws.on('INTERACTION_CREATE', this.onInteractionCreate.bind(this));
 	}
@@ -242,12 +246,12 @@ export default class Leo {
 	 * @return {Promise<Message>|Promise<null>}     The message that was sent in response
 	 * @memberof Leo
 	 */
-	async respond(interaction, data, awaitResponse=false) {
+	async respond(interaction, data, awaitResponse=false, update=false) {
 		this.cleanData(data);
 
 		// Send the response
 		await this.client.api.interactions(interaction.id, interaction.token)
-			.callback.post({ data: { type: 4, data: data } });
+			.callback.post({ data: { type: update ? 7 : 4, data: data } });
 
 		if (!awaitResponse) return null;
 
@@ -328,7 +332,7 @@ export default class Leo {
 		if (!this.config.backup) return;
 
 		console.log("Starting Backup...");
-		console.time("Backup completed in:");
+		console.time("Backup completed in");
 		
 		const backupPath = 
 			// dir/prefix.date.db
@@ -345,7 +349,7 @@ export default class Leo {
 		}
 		finally {
 			db.close();
-			console.timeEnd("Backup completed in:");
+			console.timeEnd("Backup completed in");
 		}
 	}
 
