@@ -22,11 +22,11 @@
     "@typhonjs-node-utils/better-ajv-errors": "^0.0.8",
     "better-sqlite3": "^7.1.5",
     "columnify": "^1.5.4",
-    "node-html-to-image": "^3.1.0",
-    "puppeteer": "^3.0.0",
     "discord.js": "^13.0.0-dev.755c180.1625616230",
     "handlebars": "^4.7.7",
     "node-fetch": "^2.6.1",
+    "node-html-to-image": "^3.1.0",
+    "puppeteer": "^3.0.0",
     "sequelize": "^6.6.2",
     "sqlite3": "^5.0.2"
   },
