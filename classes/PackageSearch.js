@@ -26,7 +26,7 @@ export default class PackageSearch extends InteractionHandler {
 	async init() {
 		/** @type {Object<string, function>} A set of manifest validation functions */
 		this.validator = await import("@typhonjs-fvtt/validate-manifest");
-		this.betterErrors = (await import("@typhonjs-node-utils/better-ajv-errors")).default;
+		this.betterErrors = (await import("@typhonjs-utils/better-ajv-errors")).default;
 	}
 
 	/**
