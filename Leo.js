@@ -57,7 +57,9 @@ export default class Leo {
 		await this.packages.init();
 		await this.createListeners();
 
-		this.puppeteer  = await this._puppeteer.launch();
+		this.puppeteer  = await this._puppeteer.launch({
+			args: ['--no-sandbox', '--disable-setuid-sandbox']
+		});
 		this.puppetPage = await this.puppeteer.newPage();
 
 		await this.client.login(this.config.token);
