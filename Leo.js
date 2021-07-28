@@ -96,7 +96,7 @@ export default class Leo {
 	 * @return {void} 
 	 * @memberof Leo
 	 */
-	async onMessage(message) {
+	async onMessageCreate(message) {
 	//	if (message.author.bot) return;
 		utils.debug(message);
 		
@@ -153,7 +153,7 @@ export default class Leo {
 	 */
 	async createListeners() {
 		this.client.once("ready", this.onReady.bind(this));
-		this.client.on("message", this.onMessage.bind(this));
+		this.client.on("messageCreate", this.onMessageCreate.bind(this));
 		this.client.on("messageReactionAdd", this.onMessageReactionAdd.bind(this));
 	//	this.client.on("guildMemberAdd", this.greeter.handleMessage.bind(this.greeter));
 
