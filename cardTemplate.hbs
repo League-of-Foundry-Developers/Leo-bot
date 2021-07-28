@@ -6,44 +6,109 @@
 				padding: 0;
 				font-size: 16px;
 				color: #ddd;
+				font-family: Arial, sans-serif;
+			}
+			label {
+				color: #aaa;
+				font-size: .8em
 			}
 			.card {
+				box-sizing: border-box;
 				width: {{cardWidth}}px;
 				height: {{cardHeight}}px;
 			}
 			.card {
-				background-color: #1b1a1a;
+				{{#if image}}
+					background-image: url({{image}});
+					background-size: cover;
+					align-self: normal;
+					text-shadow: 0px 0px 5px black, 0px 0px 15px black;
+				{{else}}
+					background: linear-gradient(156deg, #1b1a1a, #060606);
+				{{/if}}
+
 				padding: 1em;
 				display: grid;
-				grid-template-columns: 1fr;
-				grid-template-rows: repeat(9, auto);
+				align-items: center;
+				gap: .5em;
+				grid-template-rows: 1em repeat(4, min-content) 1fr 1em;
+				grid-template-areas: 
+					"name name thumb"
+					"title title thumb"
+					"author author thumb"
+					"version core-version core-version"
+					"system system system"
+					"description description description"
+					"stats stats stats";
+					
 			}
-			.cover {
-				grid-column: 1 / -1;
-				grid-row: 1 / -1;
-				object-fit: cover;
+			.name { 
+				grid-area: name;
+				font-family: Courier, monospace;
+				color: #aaf;
+			}
+			.title { grid-area: title; }
+			.author { 
+				grid-area: author;
+				font-size: 1.25em;
+			}
+			.thumb { 
+				grid-area: thumb;
+				background-repeat: no-repeat;
+				background-size: contain;
+				align-self: normal;
+			}
+			.version { grid-area: version; }
+			.core-version { grid-area: core-version; }
+			.systems { grid-area: system; }
+			.description { 
+				grid-area: description;
+				align-self: stretch;
+				overflow: hidden;
+				line-height: 1.25em;
+				--mask-image: linear-gradient(to bottom, black 80%, transparent);
+				-webkit-mask-image: var(--mask-image);
+				mask-image: var(--mask-image);
+				padding: .5em;
+				margin: 0 -.5em;
+				border-radius: .5em;
+				background-color: rgb(0, 0, 0, .15);
+				backdrop-filter: blur(2px);
 			}
 			.stats {
+				grid-area: stats;
 				display: flex;
 			}
 			.stats li {
 				display: flex;
 				margin-right: 3ch;
 				font-weight: bold;
+				align-items: center;
 			}
 		</style>
 	</head>
 	<body>
 		<main class="card">
-			<img class="cover" src="{{image}}">
-			<h4><code>{{name}}</code></h4>
-			<h1>{{title}}</h1>
-			<h2>{{author}}</h2>
-			<img src="{{thumb}}" width="64">
-			<h3 class="version">{{version}}</h3>
-			<h3 class="core-version">{{compatibleCoreVersion}}</h3>
-			<h4>{{systems}}</h4>
-			<p>{{{description}}}</p>
+			<h4 class="name"><code>{{name}}</code></h4>
+			<h1 class="title">{{title}}</h1>
+			<h2 class="author">
+				<label>Author:</label>
+				{{author}}
+			</h2>
+			<div class="thumb" style="background-image: url({{thumb}});" width="64"></div>
+			<h3 class="v version">
+				<label>Version:</label>
+				{{version}}
+			</h3>
+			<h3 class="v core-version">
+				<label>Core Version:</label>
+				{{compatibleCoreVersion}}
+			</h3>
+			<h4 class="systems">
+				<label>Systems:</label>
+				{{systems}}
+			</h4>
+			<div class="description">{{{description}}}</div>
 			<ul class="stats">
 				<li>
 					<label>Installs:&nbsp;</label>
