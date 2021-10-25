@@ -1,10 +1,11 @@
-import discord from "discord.js";
+import discord, { Options } from "discord.js";
 import { User } from "./database.js";
 import utils from "./utils.js";
 import PackageSearch from "./classes/PackageSearch.js";
 import ReputationManager from "./classes/ReputationManager.js";
 import Greeter from "./classes/Greeter.js";
 import Database from "better-sqlite3";
+import PollManager from "./classes/PollManager.js";
 
 const { Client, Message } = discord;
 
@@ -41,6 +42,7 @@ export default class Leo {
 		this.reputation = new ReputationManager(this);
 		this.packages   = new PackageSearch(this);
 		this.greeter    = new Greeter(this);
+		this.polls 	    = new PollManager(this);
 	}
 	
 	/**
@@ -56,6 +58,8 @@ export default class Leo {
 		await this.packages.init();
 		await this.createListeners();
 		await this.client.login(this.config.token);
+
+		await this.polls.init();
 	}
 
 	/**
@@ -141,7 +145,8 @@ export default class Leo {
 		try {
 			await Promise.all([
 				this.reputation.handleInteraction(interaction),
-				this.packages.handleInteraction(interaction)
+				this.packages.handleInteraction(interaction),
+				this.polls.handleInteraction(interaction),
 			]);
 		} catch (e) { console.error(e); }
 	}
@@ -157,7 +162,8 @@ export default class Leo {
 		this.client.on("messageReactionAdd", this.onMessageReactionAdd.bind(this));
 	//	this.client.on("guildMemberAdd", this.greeter.handleMessage.bind(this.greeter));
 
-		this.client.ws.on('INTERACTION_CREATE', this.onInteractionCreate.bind(this));
+	//	this.client.ws.on('INTERACTION_CREATE', this.onInteractionCreate.bind(this));
+		this.client.on("interactionCreate", this.onInteractionCreate.bind(this));
 	}
 
 	async updateUser(id, user) {
