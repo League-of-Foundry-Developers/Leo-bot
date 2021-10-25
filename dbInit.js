@@ -15,9 +15,17 @@ async function main() {
 	Database.Score.init(sequelize);
 	Database.User.init(sequelize);
 
+	Database.Poll.init(sequelize);
+	Database.Option.init(sequelize);
+	Database.Choice.init(sequelize);
+
 	await Database.Reputation.sync({ alter: true });
 	await Database.Score.sync({ alter: true });
 	await Database.User.sync({ alter: true });
+
+	await Database.Poll.sync({ alter: true });
+	await Database.Option.sync({ alter: true });
+	await Database.Choice.sync({ alter: true });
 }
 
 main();

@@ -174,3 +174,96 @@ export class User extends EnhancedModel {
 		}
 	}
 }
+
+
+export class Choice extends EnhancedModel {
+	async init(...args) {
+		Choice.belongsTo(Option);
+		Choice.belongsTo(Poll);
+
+		super.init(...args);
+	}
+	static get schema() {
+		return {
+			poll: {
+				type: DataTypes.INTEGER,
+				allowNull: false
+			},
+			option: {
+				type: DataTypes.INTEGER,
+				allowNull: false
+			},
+			userId: DataTypes.STRING
+		}
+	}
+	static get initOptions() {
+		return {
+			indexes: [
+				{
+					unique: false,
+					fields: ["poll"]
+				},
+				{
+					unique: false,
+					fields: ["option"]
+				}
+			]
+		}
+	}
+}
+export class Option extends EnhancedModel {
+	async init(...args) {
+		Option.hasMany(Choice, {
+			foreignKey: "option",
+			allowNull: false
+		});
+
+		Option.belongsTo(Poll);
+
+		super.init(...args);
+	}
+	static get schema() {
+		return {
+			poll: {
+				type: DataTypes.INTEGER,
+				allowNull: false
+			},
+			label: DataTypes.STRING
+		}
+	}
+	static get initOptions() {
+		return {
+			indexes: [
+				{
+					unique: false,
+					fields: ["poll"]
+				}
+			]
+		}
+	}
+}
+export class Poll extends EnhancedModel {
+	async init(...args) {
+		Poll.hasMany(Option, {
+			foreignKey: "poll",
+			allowNull: false
+		});
+
+		Poll.hasMany(Choice, {
+			foreignKey: "poll",
+			allowNull: false
+		});
+
+		super.init(...args);
+	}
+	static get schema() {
+		return {
+			creatorId: DataTypes.STRING,
+			question: DataTypes.STRING,
+			type: {
+				type: DataTypes.STRING,
+				allowNull: false
+			}
+		}
+	}
+}
