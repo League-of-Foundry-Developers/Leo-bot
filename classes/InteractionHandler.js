@@ -130,12 +130,25 @@ export default class InteractionHandler {
 
 /**
  * An alternative abstraction for interactions using the Discord.js v13 methods.
+ *
+ * @class DjsInteractionHandler
  */
 export class DjsInteractionHandler extends InteractionHandler {
+	/**
+	 * Initializes the handler as needed.
+	 */
 	async init() {
 		await this.initCommands();
 	}
 
+	/**
+	 * Creates application commands for this handler.
+	 *
+	 * @override
+	 */
+	async initCommands() { }
+
+	/** @inheritdoc */
 	async handleInteraction(interaction) {
 		switch (interaction.type) {
 			case 'APPLICATION_COMMAND': return await this.handleApplicationCommand(interaction);
@@ -143,6 +156,7 @@ export class DjsInteractionHandler extends InteractionHandler {
 		}
 	}
 	
+	/** @inheritdoc */
 	async handleApplicationCommand(interaction) {
 		if (interaction.commandName !== this.commandName) return;
 
@@ -158,6 +172,7 @@ export class DjsInteractionHandler extends InteractionHandler {
 		);
 	}
 
+	/** @inheritdoc */
 	async handleMessageComponent(interaction) {
 		let data = {};
 		try {

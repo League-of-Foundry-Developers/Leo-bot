@@ -6,7 +6,13 @@ import utils from "../utils.js";
 import Sequelize from "sequelize";
 const { Op } = Sequelize;
 
+/**
+ * Create and manage votes and polls.
+ *
+ * @class PollManager
+ */
 export default class PollManager extends DjsInteractionHandler {
+	/** @inheritdoc */
 	async init() {
 		await super.init();
 
@@ -15,9 +21,13 @@ export default class PollManager extends DjsInteractionHandler {
 		await Choice.init(this.sql);
 	}
 
+	/** @inheritdoc */
 	get commandName() { return "poll"; }
+
+	/** @inheritdoc */
 	get componentNames() { return ["vote"]; }
 
+	/** @inheritdoc */
 	async initCommands() {
 		const options = [{
 			name: "question",
@@ -66,6 +76,12 @@ export default class PollManager extends DjsInteractionHandler {
 		await this.client.application.commands.create(command, this.config.guild);
 	}
 
+	/** 
+	 * Creates the embed that represents the current results of a poll.
+	 *
+	 * @param {number} pollId    - The ID of the poll to create the embed for.
+	 * @return {Promise<Object>}   The embed object.
+	 */
 	async buildEmbed(pollId) {
 		const poll = await Poll.findOne({ where: { id: pollId } });
 
@@ -93,6 +109,14 @@ export default class PollManager extends DjsInteractionHandler {
 		}
 	}
 
+	/**
+	 * Handles interactions with message components on a poll,
+	 * including buttons and selects.
+	 *
+	 * @param {Interaction} interaction - The interaction to handle.
+	 * @param {Object} data               Data stored in the message component.
+	 * @memberof PollManager
+	 */
 	async voteComponent(interaction, data) {
 		const username = interaction.user.username;
 
@@ -107,6 +131,13 @@ export default class PollManager extends DjsInteractionHandler {
 		interaction.update({ embeds: [content] });
 	}
 
+	/**
+	 * Handles the creation of a "binary" yes/no poll.
+	 *
+	 * @param {Interaction} interaction - The interaction to handle.
+	 * @param {*} cmdOptions            - The interaction options
+	 * @memberof PollManager
+	 */
 	async binaryCommand(interaction, cmdOptions) {
 		const question = cmdOptions.get("question").value;
 
@@ -148,7 +179,14 @@ export default class PollManager extends DjsInteractionHandler {
 			]
 		});
 	}
-
+	
+	/**
+	 * Handles the creation of multiple choice poll.
+	 *
+	 * @param {Interaction} interaction - The interaction to handle.
+	 * @param {*} cmdOptions            - The interaction options
+	 * @memberof PollManager
+	 */
 	async multipleCommand(interaction, cmdOptions) {
 		const question = cmdOptions.get("question").value;
 
