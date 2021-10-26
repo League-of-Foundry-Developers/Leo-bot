@@ -62,7 +62,7 @@ export default class PollManager extends DjsInteractionHandler {
 				}
 			]
 		}
-		
+
 		await this.client.application.commands.create(command, this.config.guild);
 	}
 
@@ -82,24 +82,19 @@ export default class PollManager extends DjsInteractionHandler {
 			option.choices = choices;
 		}
 
-		const data = options.map(option => ({
-			" Options ": option.label,
-			" Votes ": option.choices.length,
-			"-- Voters --": option.choices.map(c => c.user).join(", ")
+		const fields = options.map(option => ({
+			name: `${option.label.clamp(250, "...")}: ${option.choices.length}`,
+			value: option.choices
+				.slice(0, 44)
+				.map(choice => `<@${choice.userId}>`)
+				.join(", ") 
+				+ (option.choices.length > 44 ? "..." : "")
 		}));
-
-		const message = columnify(data, {
-			columnSplitter: " | ",
-			config: {
-				" Votes ": { align: "center" },
-				"-- Voters --": { maxWidth: 39 }
-			}
-		});
 
 		return {
 			color: 0xff6400,
-			title: poll.question,
-			description: "```\n" + message + "\n```",
+			title: poll.question.clamp(256, "..."),
+			fields,
 			footer: { text: `${poll.type} poll` },
 			timestamp: new Date(Date.now()).toISOString()
 		}
