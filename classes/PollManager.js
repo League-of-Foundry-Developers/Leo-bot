@@ -72,14 +72,7 @@ export default class PollManager extends DjsInteractionHandler {
 		const options = await Option.findAll({ where: { poll: pollId } });
 
 		for (let option of options) {
-			const choices = await Choice.findAll({where: { option: option.id }});
-
-			const userIds = choices.map(choice => ({ id: choice.userId }));
-			const users = await User.findAll({ where: { [Op.or]: [userIds] }});
-
-			choices.forEach(choice => choice.user = users.find(u => u.id = choice.userId).name);
-
-			option.choices = choices;
+			option.choices = await Choice.findAll({where: { option: option.id }});
 		}
 
 		const fields = options.map(option => ({
