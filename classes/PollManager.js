@@ -66,9 +66,23 @@ export default class PollManager extends DjsInteractionHandler {
 				{
 					name: "multiple",
 					description: "Create a multiple choice poll",
-					default: true,
+					default: false,
 					type: 1,
 					options
+				},
+				{
+					name: "close",
+					description: "Close the indicated poll.",
+					default: false,
+					type: 1,
+					options: [
+						{
+							name: "poll",
+							description: "The id # of the poll to close",
+							type: 3,
+							required: true
+						}
+					]
 				}
 			]
 		}
@@ -98,13 +112,17 @@ export default class PollManager extends DjsInteractionHandler {
 				.map(choice => `<@${choice.userId}>`)
 				.join(", ") 
 				+ (option.choices.length > 44 ? "..." : "")
+				|| "*No votes*"
 		}));
+
+		const votes = options.reduce((votes, option) => votes + option.choices.length, 0);
 
 		return {
 			color: 0xff6400,
-			title: poll.question.clamp(256, "..."),
+			title: poll.question.clamp(245, "...") + (poll.closed ? " (closed)" : ""),
 			fields,
-			footer: { text: `${poll.type} poll` },
+			description: `Total votes: ${votes}`,
+			footer: { text: `${poll.type} poll #${pollId}` },
 			timestamp: new Date(Date.now()).toISOString()
 		}
 	}
@@ -118,28 +136,33 @@ export default class PollManager extends DjsInteractionHandler {
 	 * @memberof PollManager
 	 */
 	async voteComponent(interaction, data) {
-		const username = interaction.user.username;
+		const userId = interaction.user.id;
 
-		const choice = Choice.create({
+		const chosen = await Choice.findOne({ where: { poll: data.poll, userId } });
+
+		if (chosen) await chosen.update({ option: data.option || parseInt(data.values[0]) });
+		else await Choice.create({
 			poll: data.poll,
 			option: data.option || parseInt(data.values[0]),
-			userId: interaction.user.id
+			userId
 		});
 
 		let content = await this.buildEmbed(data.poll);
 
-		interaction.update({ embeds: [content] });
+		await interaction.update({ embeds: [content] });
 	}
 
 	/**
 	 * Handles the creation of a "binary" yes/no poll.
 	 *
-	 * @param {Interaction} interaction - The interaction to handle.
-	 * @param {*} cmdOptions            - The interaction options
+	 * @param {CommandInteraction} interaction - The interaction to handle.
+	 * @param {*} cmdOptions                   - The interaction options
 	 * @memberof PollManager
 	 */
 	async binaryCommand(interaction, cmdOptions) {
-		const question = cmdOptions.get("question").value;
+		await interaction.deferReply();
+
+		const question = cmdOptions.find(o => o.name == "question")?.value;
 
 		const poll = await Poll.create({
 			question,
@@ -169,7 +192,7 @@ export default class PollManager extends DjsInteractionHandler {
 			});
 		}
 
-		interaction.reply({
+		await interaction.editReply({
 			embeds: [await this.buildEmbed(poll.id)],
 			components: [
 				{
@@ -178,22 +201,27 @@ export default class PollManager extends DjsInteractionHandler {
 				}
 			]
 		});
+
+		const message = await interaction.fetchReply();
+		await poll.update({ messageId: message.id });
 	}
-	
+
 	/**
 	 * Handles the creation of multiple choice poll.
 	 *
-	 * @param {Interaction} interaction - The interaction to handle.
-	 * @param {*} cmdOptions            - The interaction options
+	 * @param {CommandInteraction} interaction - The interaction to handle.
+	 * @param {*} cmdOptions                   - The interaction options
 	 * @memberof PollManager
 	 */
 	async multipleCommand(interaction, cmdOptions) {
-		const question = cmdOptions.get("question").value;
+		await interaction.deferReply();
+
+		const question = cmdOptions.find(o => o.name == "question")?.value;
 
 		const opts = [];
 
 		for (let i = 1; i <= 5; i++) {
-			const option = cmdOptions.get(`option${i}`);
+			const option = cmdOptions.find(o => o.name == `option${i}`);
 			if (!option?.value) continue;
 			opts.push(option.value);
 		}
@@ -217,7 +245,7 @@ export default class PollManager extends DjsInteractionHandler {
 			});
 		}
 
-		interaction.reply({
+		await interaction.editReply({
 			embeds: [await this.buildEmbed(poll.id)],
 			components: [
 				{
@@ -235,5 +263,33 @@ export default class PollManager extends DjsInteractionHandler {
 				}
 			]
 		});
+
+		const message = await interaction.fetchReply();
+		await poll.update({ messageId: message.id });
+	}
+
+	/**
+	 * Close and existing poll.
+	 *
+	 * @param {CommandInteraction} interaction - The interaction to handle.
+	 * @param {*} cmdOptions                   - The interaction options
+	 * @returns 
+	 */
+	async closeCommand(interaction, cmdOptions) {
+		const pollId = cmdOptions.find(o => o.name == "poll")?.value;
+
+		const poll = await Poll.findOne({ where: { id: pollId } });
+
+		if (poll.creatorId != interaction.user.id) {
+			interaction.reply({ content: "You cannot close this poll.", ephemeral: true });
+			return;
+		}
+
+		await poll.update({ closed: true });
+
+		const message = await interaction.channel.messages.fetch(poll.messageId);
+		await message.edit({ embeds: [await this.buildEmbed(pollId)], components: [] });
+
+		await interaction.reply({ content: "Poll closed.", ephemeral: true });
 	}
 }

@@ -260,6 +260,12 @@ export class Poll extends EnhancedModel {
 		return {
 			creatorId: DataTypes.STRING,
 			question: DataTypes.STRING,
+			messageId: DataTypes.STRING,
+			closed: {
+				type: DataTypes.BOOLEAN,
+				allowNull: false,
+				defaultValue: false
+			},
 			type: {
 				type: DataTypes.STRING,
 				allowNull: false
