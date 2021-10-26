@@ -162,7 +162,7 @@ export default class Leo {
 		this.client.on("messageReactionAdd", this.onMessageReactionAdd.bind(this));
 	//	this.client.on("guildMemberAdd", this.greeter.handleMessage.bind(this.greeter));
 
-	//	this.client.ws.on('INTERACTION_CREATE', this.onInteractionCreate.bind(this));
+		this.client.ws.on('INTERACTION_CREATE', this.onInteractionCreate.bind(this));
 		this.client.on("interactionCreate", this.onInteractionCreate.bind(this));
 	}
 

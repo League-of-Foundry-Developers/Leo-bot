@@ -115,7 +115,7 @@ export default class InteractionHandler {
 	async handleMessageComponent(interaction) {
 		let data = {};
 		try {
-			data = JSON.parse(interaction.data.content);
+			data = JSON.parse(interaction.data.custom_id);
 		}
 		catch (e) {
 			data = { name: null };
@@ -160,10 +160,10 @@ export class DjsInteractionHandler extends InteractionHandler {
 	async handleApplicationCommand(interaction) {
 		if (interaction.commandName !== this.commandName) return;
 
-		const sub = interaction.options.find(o => o.type == 'SUB_COMMAND');
+		const sub = interaction.options.data.find(o => o.type == 'SUB_COMMAND');
 
 		if (!sub) return await this.command(
-			interaction, interaction.options
+			interaction, interaction.options.data
 		);
 
 		const handler = `${sub.name}Command`;
