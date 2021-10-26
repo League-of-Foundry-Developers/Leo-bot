@@ -223,7 +223,7 @@ export default class PollManager extends DjsInteractionHandler {
 		for (let i = 1; i <= 5; i++) {
 			const option = cmdOptions.find(o => o.name == `option${i}`);
 			if (!option?.value) continue;
-			opts.push(option.value);
+			opts.push(option.value.clamp(100, "..."));
 		}
 
 		const poll = await Poll.create({
