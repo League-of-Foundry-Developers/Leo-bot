@@ -113,8 +113,78 @@ export default class InteractionHandler {
 	 * @memberof InteractionHandler
 	 */
 	async handleMessageComponent(interaction) {
-		const data = JSON.parse(interaction.data.custom_id);
+		let data = {};
+		try {
+			data = JSON.parse(interaction.data.custom_id);
+		}
+		catch (e) {
+			data = { name: null };
+		}
+		
 		if (!this.componentNames.includes(data.name)) return;
+
+		const handler = `${data.name}Component`;
+		if (this[handler]) return await this[handler](interaction, data);
+	}
+}
+
+/**
+ * An alternative abstraction for interactions using the Discord.js v13 methods.
+ *
+ * @class DjsInteractionHandler
+ */
+export class DjsInteractionHandler extends InteractionHandler {
+	/**
+	 * Initializes the handler as needed.
+	 */
+	async init() {
+		await this.initCommands();
+	}
+
+	/**
+	 * Creates application commands for this handler.
+	 *
+	 * @override
+	 */
+	async initCommands() { }
+
+	/** @inheritdoc */
+	async handleInteraction(interaction) {
+		switch (interaction.type) {
+			case 'APPLICATION_COMMAND': return await this.handleApplicationCommand(interaction);
+			case 'MESSAGE_COMPONENT': return await this.handleMessageComponent(interaction);
+		}
+	}
+	
+	/** @inheritdoc */
+	async handleApplicationCommand(interaction) {
+		if (interaction.commandName !== this.commandName) return;
+
+		const sub = interaction.options.data.find(o => o.type == 'SUB_COMMAND');
+
+		if (!sub) return await this.command(
+			interaction, interaction.options.data
+		);
+
+		const handler = `${sub.name}Command`;
+		if (this[handler]) return await this[handler](
+			interaction, sub.options
+		);
+	}
+
+	/** @inheritdoc */
+	async handleMessageComponent(interaction) {
+		let data = {};
+		try {
+			data = JSON.parse(interaction.customId);
+		}
+		catch (e) {
+			data = { name: null };
+		}
+
+		if (!this.componentNames.includes(data.name)) return;
+
+		data.values = interaction.values;
 
 		const handler = `${data.name}Component`;
 		if (this[handler]) return await this[handler](interaction, data);
