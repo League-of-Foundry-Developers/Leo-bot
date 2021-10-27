@@ -211,6 +211,57 @@ export default class PollManager extends DjsInteractionHandler {
 		}];
 	}
 
+	/**
+	 * Bulds the options for a poll.
+	 *
+	 * @param {Poll} poll
+	 * @param {Object} cmdOptions
+	 * @param {string} type - The type of poll
+	 * @return {Object[]} 
+	 * @memberof PollManager
+	 */
+	buildOptions(poll, cmdOptions, type) {
+		switch (type) {
+			case "binary": return this.buildBinaryOptions(poll, cmdOptions);
+			case "multiple": return this.buildMultipleOptions(poll, cmdOptions);
+		}
+	}
+
+	/**
+	 * Bulds the options for a binary poll.
+	 *
+	 * @param {Poll} poll
+	 * @param {Object} cmdOptions
+	 * @return {Object[]}
+	 * @memberof PollManager
+	 */
+	buildBinaryOptions(poll, cmdOptions) {
+		return [
+			{ poll: poll.id, label: "Yes" },
+			{ poll: poll.id, label: "No" }
+		]
+	}
+
+	/**
+	 * Bulds the options for a multiple choice poll.
+	 *
+	 * @param {Poll} poll
+	 * @param {Object} cmdOptions
+	 * @return {Object[]}
+	 * @memberof PollManager
+	 */
+	buildMultipleOptions(poll, cmdOptions) {
+		const opts = [];
+
+		for (let i = 1; i <= 20; i++) {
+			const option = cmdOptions.find(o => o.name == `option${i}`);
+			if (!option?.value) continue;
+			opts.push(option.value.clamp(100, "..."));
+		}
+
+		return opts.map(option => ({ poll: poll.id, label: option }))
+	}
+
 
 	/**
 	 * Handles interactions with message components on a poll,
@@ -245,36 +296,7 @@ export default class PollManager extends DjsInteractionHandler {
 	 * @memberof PollManager
 	 */
 	async binaryCommand(interaction, cmdOptions) {
-		await interaction.deferReply();
-
-		const question = cmdOptions.find(o => o.name == "question")?.value;
-
-		const poll = await Poll.create({
-			question,
-			creatorId: interaction.user.id,
-			type: "binary"
-		});
-
-		const options = await Option.bulkCreate([
-			{
-				poll: poll.id,
-				label: "Yes"
-			},
-			{
-				poll: poll.id,
-				label: "No"
-			}
-		]);
-
-		const [embed, components] = await Promise.all([
-			this.buildEmbed(poll.id),
-			this.buildComponents(poll, options)
-		]);
-
-		await interaction.editReply({ embeds: [embed], components });
-
-		const message = await interaction.fetchReply();
-		await poll.update({ messageId: message.id });
+		this.createPoll(interaction, cmdOptions, "binary");
 	}
 
 	/**
@@ -285,27 +307,25 @@ export default class PollManager extends DjsInteractionHandler {
 	 * @memberof PollManager
 	 */
 	async multipleCommand(interaction, cmdOptions) {
+		this.createPoll(interaction, cmdOptions, "multiple");
+	}
+
+	/**
+	 * Handles the creation of multiple choice poll.
+	 *
+	 * @param {CommandInteraction} interaction - The interaction to handle.
+	 * @param {*} cmdOptions                   - The interaction options
+	 * @param {string} type                    - The type of poll 
+	 * @memberof PollManager
+	 */
+	async createPoll(interaction, cmdOptions, type) {
 		await interaction.deferReply();
 
 		const question = cmdOptions.find(o => o.name == "question")?.value;
 
-		const opts = [];
+		const poll = await Poll.create({ question, type, creatorId: interaction.user.id });
 
-		for (let i = 1; i <= 20; i++) {
-			const option = cmdOptions.find(o => o.name == `option${i}`);
-			if (!option?.value) continue;
-			opts.push(option.value.clamp(100, "..."));
-		}
-
-		const poll = await Poll.create({
-			question,
-			creatorId: interaction.user.id,
-			type: "multiple"
-		});
-
-		const toCreate = opts.map(option => ({ poll: poll.id, label: option }))
-
-		const options = await Option.bulkCreate(toCreate);
+		const options = await Option.bulkCreate(this.buildOptions(poll, cmdOptions, type));
 
 		const [embed, components] = await Promise.all([
 			this.buildEmbed(poll.id),
