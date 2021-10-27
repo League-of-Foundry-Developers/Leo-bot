@@ -83,6 +83,20 @@ export default class PollManager extends DjsInteractionHandler {
 							required: true
 						}
 					]
+				},
+				{
+					name: "show",
+					description: "Show the indicated poll by sending a new message.",
+					default: false,
+					type: 1,
+					options: [
+						{
+							name: "poll",
+							description: "The id # of the poll to show",
+							type: 3,
+							required: true
+						}
+					]
 				}
 			]
 		}
@@ -329,5 +343,30 @@ export default class PollManager extends DjsInteractionHandler {
 		}
 		
 		await interaction.reply({ content: "Poll closed.", ephemeral: true });
+	}
+
+	async showCommand(interaction, cmdOptions) {
+		const pollId = cmdOptions.find(o => o.name == "poll")?.value;
+
+		const poll = await Poll.findOne({ where: { id: pollId } });
+
+		const options = await Option.findAll({ where: { poll: pollId } });
+
+		const [embed, components] = await Promise.all([
+			this.buildEmbed(pollId),
+			this.buildComponents(poll, options)
+		]);
+
+		try {
+			const original = await interaction.channel.messages.fetch(poll.messageId);
+			await original.delete();
+		} catch (e) {
+			return await interaction.reply({ content: "Poll could not be found. Are you sure it was in this channel?", ephemeral: true });
+		}
+
+		await interaction.reply({ embeds: [embed], components });
+		
+		const message = await interaction.fetchReply();
+		await poll.update({ messageId: message.id });
 	}
 }
