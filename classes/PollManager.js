@@ -220,7 +220,7 @@ export default class PollManager extends DjsInteractionHandler {
 
 		const opts = [];
 
-		for (let i = 1; i <= 5; i++) {
+		for (let i = 1; i <= 20; i++) {
 			const option = cmdOptions.find(o => o.name == `option${i}`);
 			if (!option?.value) continue;
 			opts.push(option.value.clamp(100, "..."));
@@ -255,7 +255,7 @@ export default class PollManager extends DjsInteractionHandler {
 							type: 3,
 							custom_id: `{"name": "vote", "type": "multiple", "poll": ${poll.id}}`,
 							options: components,
-							placeholder: "Choose and option",
+							placeholder: "Choose an option",
 							min_values: 1,
 							max_values: 1
 						}

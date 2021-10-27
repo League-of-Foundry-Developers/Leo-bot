@@ -1,6 +1,6 @@
 {
   "name": "leo-bot",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "League of Exaordinary Foundry VTT Developers Discord Bot",
   "main": "main.js",
   "type": "module",
