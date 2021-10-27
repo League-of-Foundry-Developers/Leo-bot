@@ -128,6 +128,77 @@ export default class PollManager extends DjsInteractionHandler {
 	}
 
 	/**
+	 * Creates the message components for a poll.
+	 *
+	 * @param {Poll} poll
+	 * @param {Option[]} options
+	 * @return {Object[]} 
+	 * @memberof PollManager
+	 */
+	async buildComponents(poll, options) {
+		if (poll.closed) return [];
+
+		switch (poll.type) {
+			case "binary": return await this.buildBinaryComponents(poll, options);
+			case "multiple": return await this.buildMultipleComponents(poll, options);
+		}
+	}
+
+	/**
+	 * Creates the message components for a binary poll.
+	 *
+	 * @param {Poll} poll
+	 * @param {Option[]} options
+	 * @return {Object[]}
+	 * @memberof PollManager
+	 */
+	async buildBinaryComponents(poll, options) {
+		let components = [];
+
+		for (let option of options) {
+			components.push({
+				type: 2,
+				label: option.label,
+				style: option.label == "Yes" ? 3 : 4,
+				custom_id: `{"name": "vote", "type": "binary", "option": "${option.id}", "poll": ${poll.id}}`
+			});
+		}
+
+		return [{ type: 1, components }];
+	}
+
+	/**
+	 * Creates the message components for a multiple choice poll.
+	 *
+	 * @param {Poll} poll
+	 * @param {Option[]} options
+	 * @return {Object[]}
+	 * @memberof PollManager
+	 */
+	async buildMultipleComponents(poll, options) {
+		let components = [];
+
+		for (let option of options) {
+			components.push({
+				label: option.label,
+				value: option.id.toString()
+			});
+		}
+
+		return [{
+			type: 1, components: [{
+				type: 3,
+				custom_id: `{"name": "vote", "type": "multiple", "poll": ${poll.id}}`,
+				options: components,
+				placeholder: "Choose an option",
+				min_values: 1,
+				max_values: 1
+			}]
+		}];
+	}
+
+
+	/**
 	 * Handles interactions with message components on a poll,
 	 * including buttons and selects.
 	 *
@@ -181,26 +252,12 @@ export default class PollManager extends DjsInteractionHandler {
 			}
 		]);
 
-		let components = [];
+		const [embed, components] = await Promise.all([
+			this.buildEmbed(poll.id),
+			this.buildComponents(poll, options)
+		]);
 
-		for (let option of options) {
-			components.push({
-				type: 2,
-				label: option.label,
-				style: option.label == "Yes" ? 3 : 4,
-				custom_id: `{"name": "vote", "type": "binary", "option": "${option.id}", "poll": ${poll.id}}`
-			});
-		}
-
-		await interaction.editReply({
-			embeds: [await this.buildEmbed(poll.id)],
-			components: [
-				{
-					type: 1,
-					components
-				}
-			]
-		});
+		await interaction.editReply({ embeds: [embed], components });
 
 		const message = await interaction.fetchReply();
 		await poll.update({ messageId: message.id });
@@ -236,33 +293,12 @@ export default class PollManager extends DjsInteractionHandler {
 
 		const options = await Option.bulkCreate(toCreate);
 
-		let components = [];
+		const [embed, components] = await Promise.all([
+			this.buildEmbed(poll.id),
+			this.buildComponents(poll, options)
+		]);
 
-		for (let option of options) {
-			components.push({
-				label: option.label,
-				value: option.id.toString()
-			});
-		}
-
-		await interaction.editReply({
-			embeds: [await this.buildEmbed(poll.id)],
-			components: [
-				{
-					type: 1,
-					components: [
-						{
-							type: 3,
-							custom_id: `{"name": "vote", "type": "multiple", "poll": ${poll.id}}`,
-							options: components,
-							placeholder: "Choose an option",
-							min_values: 1,
-							max_values: 1
-						}
-					]
-				}
-			]
-		});
+		await interaction.editReply({ embeds: [embed], components });
 
 		const message = await interaction.fetchReply();
 		await poll.update({ messageId: message.id });
@@ -281,15 +317,17 @@ export default class PollManager extends DjsInteractionHandler {
 		const poll = await Poll.findOne({ where: { id: pollId } });
 
 		if (poll.creatorId != interaction.user.id) {
-			interaction.reply({ content: "You cannot close this poll.", ephemeral: true });
-			return;
+			return await interaction.reply({ content: "You must be the creator of this poll to close it.", ephemeral: true });
 		}
 
-		await poll.update({ closed: true });
-
-		const message = await interaction.channel.messages.fetch(poll.messageId);
-		await message.edit({ embeds: [await this.buildEmbed(pollId)], components: [] });
-
+		try {
+			const message = await interaction.channel.messages.fetch(poll.messageId);
+			await poll.update({ closed: true });
+			await message.edit({ embeds: [await this.buildEmbed(pollId)], components: [] });
+		} catch (e) {
+			return await interaction.reply({ content: "Poll could not be found. Are you sure it was in this channel?", ephemeral: true });
+		}
+		
 		await interaction.reply({ content: "Poll closed.", ephemeral: true });
 	}
 }
