@@ -140,7 +140,8 @@ export default class Leo {
 	 * @memberof Leo
 	 */
 	async onInteractionCreate(interaction) {
-		utils.debug(interaction);
+		//utils.debug(interaction);
+		console.log(JSON.stringify(interaction));
 
 		try {
 			await Promise.all([
@@ -290,24 +291,14 @@ export default class Leo {
 			data.content = data.content.substring(0, contentMax - 3) + "...";
 
 		data.embeds?.forEach(embed => {
-			if (embed.title?.length > descrMax)
-				embed.title = embed.title.substring(0, titleMax - 3) + "...";
-
-			if (embed.author?.length > descrMax)
-				embed.author = embed.author.substring(0, authorMax - 3) + "...";
-				
-			if (embed.description?.length > descrMax)
-				embed.description = embed.description.substring(0, descrMax - 3) + "...";
-
-			if (embed.footer?.length > descrMax)
-				embed.footer = embed.footer.substring(0, footerMax - 3) + "...";
+			embed.title       = embed.title?.clamp(titleMax, "...");
+			embed.author      = embed.author?.clamp(authorMax, "...");
+			embed.description = embed.description?.clamp(descrMax, "...");
+			embed.footer      = embed.footer?.clamp(footerMax, "...");
 
 			embed.fields?.forEach(field => {
-				if (field.name?.length > descrMax)
-					field.name = field.name.substring(0, nameMax - 3) + "...";
-
-				if (field.value?.length > descrMax)
-					field.value = field.value.substring(0, valueMax - 3) + "...";
+				field.name    = field.name?.clamp(nameMax, "...");
+				field.value   = field.value?.clamp(valueMax, "...");
 			});
 		});
 	}
