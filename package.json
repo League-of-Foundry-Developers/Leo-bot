@@ -30,9 +30,9 @@
     "handlebars": "^4.7.7",
     "node-fetch": "^2.6.1",
     "node-html-to-image": "^3.1.0",
-    "puppeteer": "^3.0.0",
+    "puppeteer": "^13.0.0",
     "sequelize": "^6.6.2",
-    "sqlite3": "^5.0.2"
+    "sqlite3": "^4.2.0"
   },
   "devDependencies": {
     "sequelize-cli": "^6.2.0"

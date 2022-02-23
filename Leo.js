@@ -147,8 +147,7 @@ export default class Leo {
 	 * @memberof Leo
 	 */
 	async onInteractionCreate(interaction) {
-		//utils.debug(interaction);
-		console.log(JSON.stringify(interaction));
+		utils.debug(interaction);
 
 		try {
 			await Promise.all([
@@ -312,7 +311,7 @@ export default class Leo {
 			embed.title       = embed.title?.clamp(titleMax, "...");
 			embed.author      = embed.author?.clamp(authorMax, "...");
 			embed.description = embed.description?.clamp(descrMax, "...");
-			embed.footer      = embed.footer?.clamp(footerMax, "...");
+			embed.footer.text = embed.footer?.text?.clamp(footerMax, "...");
 
 			embed.fields?.forEach(field => {
 				field.name    = field.name?.clamp(nameMax, "...");
