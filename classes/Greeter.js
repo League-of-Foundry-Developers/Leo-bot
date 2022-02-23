@@ -33,10 +33,10 @@ export default class Greeter {
 		
 		utils.debug("Member Joined:", message.author.username);
 
-		const reactions = await message.awaitReactions(
-			reaction => reaction.emoji.name == this.reaction.name,
-			{ time: (Math.random() * this.reaction.random) + this.reaction.delay }
-		)
+		const reactions = await message.awaitReactions({ 
+			filter: reaction => reaction.emoji.name == this.reaction.name,
+			time: (Math.random() * this.reaction.random) + this.reaction.delay 
+		});
 
 		utils.debug(reactions);
 

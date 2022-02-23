@@ -1,10 +1,11 @@
-import discord from "discord.js";
+import discord, { Options } from "discord.js";
 import { User } from "./database.js";
 import utils from "./utils.js";
 import PackageSearch from "./classes/PackageSearch.js";
 import ReputationManager from "./classes/ReputationManager.js";
 import Greeter from "./classes/Greeter.js";
 import Database from "better-sqlite3";
+import PollManager from "./classes/PollManager.js";
 
 const { Client, Message } = discord;
 
@@ -42,6 +43,7 @@ export default class Leo {
 		this.packages   = new PackageSearch(this);
 		this._puppeteer = puppeteer;
 		this.greeter    = new Greeter(this);
+		this.polls 	    = new PollManager(this);
 	}
 	
 	/**
@@ -63,6 +65,8 @@ export default class Leo {
 		this.puppetPage = await this.puppeteer.newPage();
 
 		await this.client.login(this.config.token);
+
+		await this.polls.init();
 	}
 
 	/**
@@ -103,7 +107,7 @@ export default class Leo {
 	 * @return {void} 
 	 * @memberof Leo
 	 */
-	async onMessage(message) {
+	async onMessageCreate(message) {
 	//	if (message.author.bot) return;
 		utils.debug(message);
 		
@@ -143,12 +147,14 @@ export default class Leo {
 	 * @memberof Leo
 	 */
 	async onInteractionCreate(interaction) {
-		utils.debug(interaction);
+		//utils.debug(interaction);
+		console.log(JSON.stringify(interaction));
 
 		try {
 			await Promise.all([
 				this.reputation.handleInteraction(interaction),
-				this.packages.handleInteraction(interaction)
+				this.packages.handleInteraction(interaction),
+				this.polls.handleInteraction(interaction),
 			]);
 		} catch (e) { console.error(e); }
 	}
@@ -160,11 +166,12 @@ export default class Leo {
 	 */
 	async createListeners() {
 		this.client.once("ready", this.onReady.bind(this));
-		this.client.on("message", this.onMessage.bind(this));
+		this.client.on("messageCreate", this.onMessageCreate.bind(this));
 		this.client.on("messageReactionAdd", this.onMessageReactionAdd.bind(this));
 	//	this.client.on("guildMemberAdd", this.greeter.handleMessage.bind(this.greeter));
 
 		this.client.ws.on('INTERACTION_CREATE', this.onInteractionCreate.bind(this));
+		this.client.on("interactionCreate", this.onInteractionCreate.bind(this));
 	}
 
 	async updateUser(id, user) {
@@ -302,24 +309,14 @@ export default class Leo {
 			data.content = data.content.substring(0, contentMax - 3) + "...";
 
 		data.embeds?.forEach(embed => {
-			if (embed.title?.length > descrMax)
-				embed.title = embed.title.substring(0, titleMax - 3) + "...";
-
-			if (embed.author?.length > descrMax)
-				embed.author = embed.author.substring(0, authorMax - 3) + "...";
-				
-			if (embed.description?.length > descrMax)
-				embed.description = embed.description.substring(0, descrMax - 3) + "...";
-
-			if (embed.footer?.length > descrMax)
-				embed.footer = embed.footer.substring(0, footerMax - 3) + "...";
+			embed.title       = embed.title?.clamp(titleMax, "...");
+			embed.author      = embed.author?.clamp(authorMax, "...");
+			embed.description = embed.description?.clamp(descrMax, "...");
+			embed.footer      = embed.footer?.clamp(footerMax, "...");
 
 			embed.fields?.forEach(field => {
-				if (field.name?.length > descrMax)
-					field.name = field.name.substring(0, nameMax - 3) + "...";
-
-				if (field.value?.length > descrMax)
-					field.value = field.value.substring(0, valueMax - 3) + "...";
+				field.name    = field.name?.clamp(nameMax, "...");
+				field.value   = field.value?.clamp(valueMax, "...");
 			});
 		});
 	}

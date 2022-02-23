@@ -1,6 +1,6 @@
 {
   "name": "leo-bot",
-  "version": "1.3.0",
+  "version": "1.4.3",
   "description": "League of Exaordinary Foundry VTT Developers Discord Bot",
   "main": "main.js",
   "type": "module",
@@ -17,12 +17,16 @@
   },
   "author": "zeel",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/League-of-Foundry-Developers/Leo-bot.git"
+  },
   "dependencies": {
     "@typhonjs-fvtt/validate-manifest": "^0.0.0",
     "@typhonjs-utils/better-ajv-errors": "^0.0.10",
     "better-sqlite3": "^7.1.5",
     "columnify": "^1.5.4",
-    "discord.js": "^13.0.0-dev.755c180.1625616230",
+    "discord.js": "^13.2.0",
     "handlebars": "^4.7.7",
     "node-fetch": "^2.6.1",
     "node-html-to-image": "^3.1.0",

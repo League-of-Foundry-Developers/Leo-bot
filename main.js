@@ -10,6 +10,22 @@ import Leo from "./Leo.js";
 const { Client, Intents } = discord;
 const { Sequelize, DataTypes, Model } = seq;
 
+
+/**
+ * A string prototype extension that returns a string clamped to a specific length,
+ * optionally ending with a specified string such as "..." the suffix will be included
+ * within the length limit.
+ * 
+ * @param {number} max 
+ * @param {string} ending 
+ * @returns 
+ */
+String.prototype.clamp = function (max, ending = "") {
+	max = max - ending.length;
+	let str = this.trimEnd();
+	return str.length > max ? str.substr(0, max) + ending : str;
+}
+
 /**
  * The primary function that sets everythign into motion.
  * Creates instances of the SQL ORM, and Discord.js client,
