@@ -291,10 +291,13 @@ export default class Leo {
 			data.content = data.content.substring(0, contentMax - 3) + "...";
 
 		data.embeds?.forEach(embed => {
+			console.log(embed);
 			embed.title       = embed.title?.clamp(titleMax, "...");
-			embed.author      = embed.author?.clamp(authorMax, "...");
+			if (embed.author) 
+				embed.author.name = embed.author.name?.clamp(authorMax, "...");
 			embed.description = embed.description?.clamp(descrMax, "...");
-			embed.footer.text = embed.footer?.text?.clamp(footerMax, "...");
+			if (embed.footer)
+				embed.footer.text = embed.footer.text?.clamp(footerMax, "...");
 
 			embed.fields?.forEach(field => {
 				field.name    = field.name?.clamp(nameMax, "...");
